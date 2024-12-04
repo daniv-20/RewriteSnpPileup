@@ -542,6 +542,13 @@ if (!bgzf) {
     // Rcpp::Rcout << "Debug: opened output." << std::endl;
     
   }
+
+  {
+    std::ostringstream oss;
+    oss << "Debug: Do we have an output file: " << fname;
+    debugPrint(oss.str(), arguments.debug_mode);
+  }
+
   if (!output_file)
     {
       printf("Failed to open output file for writing: %s\n", strerror(errno));
