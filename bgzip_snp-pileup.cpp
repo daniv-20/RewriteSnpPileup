@@ -508,7 +508,12 @@ if (!bgzf) {
     arguments.outFunc = print_output; // Default to plain text output
   }
   // check if output exists
-  debugPrint("Debug: Check if output exists", arguments.debug_mode);
+  {
+    std::ostringstream oss;
+    oss << "Debug: Checking file existence for: " << fname;
+    debugPrint(oss.str(), arguments.debug_mode);
+  }
+
   // Rcpp::Rcout << "Debug: check if output exists." << std::endl;
   FILE *test_output = fopen(fname.c_str(), "r");
   if (test_output)
@@ -519,13 +524,14 @@ if (!bgzf) {
     fclose(test_output);
     return 1;
   }
-  debugPrint("Debug: checked output", arguments.debug_mode);
+  debugPrint("Debug: Ready to open output", arguments.debug_mode);
   // Rcpp::Rcout << "Debug: checked output." << std::endl;
   //  DON'T CLOSE test_output HERE because if you are here, test_output is null
   FILE *output_file = NULL;
   if (arguments.gzipped)
   {
     arguments.gzippedPointer = bgzf_open(fname.c_str(), "w+");
+    debugPrint("Debug: opened gzipped file", arguments.debug_mode);
   }
   else
   {
@@ -534,16 +540,18 @@ if (!bgzf) {
     output_file = fopen(fname.c_str(), "w+");
     debugPrint("Debug: opened output", arguments.debug_mode);
     // Rcpp::Rcout << "Debug: opened output." << std::endl;
-    if (!output_file)
+    
+  }
+  if (!output_file)
     {
       printf("Failed to open output file for writing: %s\n", strerror(errno));
       Rcpp::Rcerr << "Error: Failed to open output file for writing: " << strerror(errno) << std::endl;
+      debugPrint("Debug: output file DNE", arguments.debug_mode);
       return 1;
+    }else{
+        debugPrint("Debug: File opened successfully", arguments.debug_mode);
     }
-  }
-
   // Rcpp::Rcout << "Debug: File opened successfully." << std::endl;
-  debugPrint("Debug: File opened successfully", arguments.debug_mode);
   ostringstream output;
 
   // output header to file
@@ -564,18 +572,38 @@ if (!bgzf) {
     debugPrint(oss.str(), arguments.debug_mode);
   }
 
-  // Write header to file
+  // Write header to file -> does this need to be different for gzip???
   std::string header = output.str();
-  size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
-  if (written != header.size())
-  {
-    Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
-  }
-  else
-  {
-    // Rcpp::Rcout << "Debug: Header written successfully." << std::endl;
-    debugPrint("Debug: header written successfully", arguments.debug_mode);
-  }
+
+// 04DEC - see if this changes things
+
+if (arguments.gzipped) {
+    ssize_t written = bgzf_write(arguments.gzippedPointer, header.c_str(), header.size());
+    if (written != static_cast<ssize_t>(header.size())) {
+        Rcpp::Rcerr << "Error: Failed to write the complete header to gzipped file." << std::endl;
+    } else {
+        debugPrint("Debug: Header written successfully to gzipped file", arguments.debug_mode);
+    }
+} else {
+    size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
+    if (written != header.size()) {
+        Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
+    } else {
+        debugPrint("Debug: Header written successfully to file", arguments.debug_mode);
+    }
+}
+
+
+  // size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
+  // if (written != header.size())
+  // {
+  //   Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
+  // }
+  // else
+  // {
+  //   // Rcpp::Rcout << "Debug: Header written successfully." << std::endl;
+  //   debugPrint("Debug: header written successfully", arguments.debug_mode);
+  // }
 
   // check on outfunc
   if (arguments.outFunc != nullptr)
@@ -686,14 +714,14 @@ float last_progress = 100.0;
         if (tid == vcf_tid && pos == vcf_pos) {
             debugPrint("Debug: Found matching SNP position!", arguments.debug_mode);
 
-         {
-                std::ostringstream oss;
-                oss << "Debug: Match found - Chrom=" << chrom
-                    << ", Pos=" << vcf_pos
-                    << ", Ref=" << ref
-                    << ", Alt=" << alt;
-                debugPrint(oss.str(), arguments.debug_mode);
-            }
+        //  {
+        //         std::ostringstream oss;
+        //         oss << "Debug: Match found - Chrom=" << chrom
+        //             << ", Pos=" << vcf_pos
+        //             << ", Ref=" << ref
+        //             << ", Alt=" << alt;
+        //         debugPrint(oss.str(), arguments.debug_mode);
+        //     }
 
             // Process the pileup data for each file
             // output data to output file
@@ -709,11 +737,11 @@ float last_progress = 100.0;
                 file_info this_file = {0, 0, 0, 0}; // Initialize counts
                 if (n_plp[i] >= arguments.min_read_counts[i]) 
                 {
-                    {
-              std::ostringstream oss;
-              oss << "Debug: Sufficient reads for file " << (i + 1);
-              debugPrint(oss.str(), arguments.debug_mode);
-            }
+            //         {
+            //   std::ostringstream oss;
+            //   oss << "Debug: Sufficient reads for file " << (i + 1);
+            //   debugPrint(oss.str(), arguments.debug_mode);
+            // }
 
                     for (int j = 0; j < n_plp[i]; ++j) {
                         const bam_pileup1_t *p = plp[i] + j;
@@ -740,14 +768,14 @@ float last_progress = 100.0;
                     is_not_zero = true;
                 }
                 f_info.push_back(this_file);
-                          {
-            std::ostringstream oss;
-            oss << "Debug: File " << i + 1 << " processed. Refs="
-                << this_file.refs << ", Alts=" << this_file.alts
-                << ", Errors=" << this_file.errors
-                << ", Deletions=" << this_file.deletions;
-            debugPrint(oss.str(), arguments.debug_mode);
-          }
+          //                 {
+          //   std::ostringstream oss;
+          //   oss << "Debug: File " << i + 1 << " processed. Refs="
+          //       << this_file.refs << ", Alts=" << this_file.alts
+          //       << ", Errors=" << this_file.errors
+          //       << ", Deletions=" << this_file.deletions;
+          //   debugPrint(oss.str(), arguments.debug_mode);
+          // }
             }
 
           debugPrint("Debug: end for loop, start print output", arguments.debug_mode);

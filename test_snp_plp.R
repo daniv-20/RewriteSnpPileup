@@ -1,5 +1,3 @@
-
-
 getwd()
 
 setwd("/home/nfs/vaithid1/FACETS/RewriteSnpPileup")
@@ -26,26 +24,34 @@ datapath = "/ebfs/epibio/seshanv/snp-pileup"
 
 vcf = "/usr/local/share/VCF/common_all_20180418_dedup_bg.vcf.gz"
 
-outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "test1.csv")
+out = generate_output_file("test", ".csv")
 
-input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug")
+outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", out)
+
+input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug", "-g")
 
 ## set up log file
 
-log = generate_output_file(base_name = "Log")
+log = generate_output_file(base_name = "Log", ".txt")
 
 logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
+out = generate_output_file("test", "")
+
+outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", out)
+
+input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug", "-g")
+
 sink(logfile)
 
-cat("Current run: Run without gzip output")
+cat("Current run: Try Gzip output, made code update to hopefully fix writer")
 
 # Compile the file using sourceCpp
 Rcpp::sourceCpp("bgzip_snp-pileup.cpp", rebuild = TRUE, verbose = TRUE)
 
 htslib_version()
 
-delete_if_exists(outfile)
+# delete_if_exists(outfile)
 
 run_snp_pileup(input_args)
 # Cleanup: Restore the original Makevars
@@ -53,6 +59,7 @@ Sys.unsetenv("R_MAKEVARS_USER")
 unlink(temp_makevars)
 
 sink()
+cat("unsunk")
 
 ## check out results for funsies
 ##source("/home/nfs/vaithid1/FACETS/RewriteSnpPileup/lookAtOutput.R")
