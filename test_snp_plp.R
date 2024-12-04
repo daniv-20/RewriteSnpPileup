@@ -37,11 +37,11 @@ logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
 outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped.csv")
 
-input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug", "-g")
+input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--p", "-g")
 
 sink(logfile)
 
-cat("Current run: Try Gzip output, made code update to hopefully fix writer: ")
+cat("Current run: Try progress bar...")
 cat(paste("\nArgs: ", paste0(input_args, collapse = ", ")))
 
 # Compile the file using sourceCpp
