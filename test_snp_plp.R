@@ -28,8 +28,17 @@ vcf = "/usr/local/share/VCF/common_all_20180418_dedup_bg.vcf.gz"
 
 outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "test1.csv")
 
-input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"))
+input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug")
 
+## set up log file
+
+log = generate_output_file(base_name = "Log")
+
+logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
+
+sink(logfile)
+
+cat("Current run: Run without gzip output")
 
 # Compile the file using sourceCpp
 Rcpp::sourceCpp("bgzip_snp-pileup.cpp", rebuild = TRUE, verbose = TRUE)
@@ -43,8 +52,10 @@ run_snp_pileup(input_args)
 Sys.unsetenv("R_MAKEVARS_USER")
 unlink(temp_makevars)
 
+sink()
+
 ## check out results for funsies
-source("/home/nfs/vaithid1/FACETS/RewriteSnpPileup/lookAtOutput.R")
+##source("/home/nfs/vaithid1/FACETS/RewriteSnpPileup/lookAtOutput.R")
 # output = read.csv(outfile)
 
 # ## output columns

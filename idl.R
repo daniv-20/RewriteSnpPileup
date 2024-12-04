@@ -49,3 +49,13 @@ delete_if_exists <- function(file_path) {
     return(FALSE)
   }
 }
+
+generate_output_file <- function(base_name = "output") {
+  # Get the current date and time
+  timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
+  
+  # Construct the file name
+  file_name <- paste0(base_name, "_", timestamp, ".txt")
+  
+  return(file_name)
+}

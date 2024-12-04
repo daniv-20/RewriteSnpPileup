@@ -17,6 +17,7 @@ manage_packages(packages)
 ## check out results for funsies
 outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "test1.csv")
 output = read.csv(outfile)
+output = output[-1,]
 
 ## output columns
 ## chromosome position ref alt  then for each file there is an R E A D
@@ -27,12 +28,17 @@ names_pattern = "File(\\d+)([RAED])"  # Regex to separate file number and RAED
   mutate(across(
     .cols = -c(Chromosome, Position, Ref, Alt),  # Exclude Ref and Alt columns
     .fns = as.numeric      # Apply as.numeric
-  )) %>% tbl_summary(
-    by = file,
-    digits = all_continuous() ~ 1,
-    statistic = all_continuous() ~ "{mean}, ({sd})"
-  ) %>% as_gt() 
+  )) %>%
+    rename(
+      ReferenceCounts = R,
+      AlternativeCounts = A,
+      Errors = E,
+      Deletions = D
+    ) 
 
-  write.csv(as.data.frame(output.long), file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "test1_pretty.csv"))
+head(output.long)
+
+
+write.csv(as.data.frame(summ), file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "test1_pretty.csv"))
 
   
