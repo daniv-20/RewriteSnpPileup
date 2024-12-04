@@ -1,3 +1,5 @@
+rm(list = ls())
+
 getwd()
 
 setwd("/home/nfs/vaithid1/FACETS/RewriteSnpPileup")
@@ -24,11 +26,6 @@ datapath = "/ebfs/epibio/seshanv/snp-pileup"
 
 vcf = "/usr/local/share/VCF/common_all_20180418_dedup_bg.vcf.gz"
 
-## out = generate_output_file("test", ".csv")
-
-outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "testZipped.csv")
-
-input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug", "-g")
 
 ## set up log file
 
@@ -36,9 +33,9 @@ log = generate_output_file(base_name = "Log", ".txt")
 
 logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
-out = generate_output_file("test", "")
+## out = generate_output_file("test", "")
 
-outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", out)
+outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped.csv")
 
 input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--debug", "-g")
 
