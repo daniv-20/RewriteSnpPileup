@@ -49,7 +49,7 @@ Rcpp::sourceCpp("bgzip_snp-pileup.cpp", rebuild = TRUE)
 
 htslib_version()
 
-# delete_if_exists(outfile)
+delete_if_exists(outfile)
 
 run_snp_pileup(input_args)
 # Cleanup: Restore the original Makevars
