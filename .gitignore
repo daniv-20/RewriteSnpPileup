@@ -1,2 +1,4 @@
 /outputs
 /rhtslib_symbols.txt
+*.Rout
+*.csv
