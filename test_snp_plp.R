@@ -41,10 +41,11 @@ input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(
 
 sink(logfile)
 
-cat("Current run: Try Gzip output, made code update to hopefully fix writer")
+cat("Current run: Try Gzip output, made code update to hopefully fix writer: ")
+cat(paste("\nArgs: ", paste0(input_args, collapse = ", ")))
 
 # Compile the file using sourceCpp
-Rcpp::sourceCpp("bgzip_snp-pileup.cpp", rebuild = TRUE, verbose = TRUE)
+Rcpp::sourceCpp("bgzip_snp-pileup.cpp", rebuild = TRUE)
 
 htslib_version()
 

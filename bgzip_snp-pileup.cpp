@@ -531,6 +531,10 @@ if (!bgzf) {
   if (arguments.gzipped)
   {
     arguments.gzippedPointer = bgzf_open(fname.c_str(), "w+");
+    if (!arguments.gzippedPointer) {
+        Rcpp::Rcerr << "Error: Failed to open gzipped output file." << std::endl;
+        return 1;
+    }
     debugPrint("Debug: opened gzipped file", arguments.debug_mode);
   }
   else
@@ -541,23 +545,18 @@ if (!bgzf) {
     debugPrint("Debug: opened output", arguments.debug_mode);
     // Rcpp::Rcout << "Debug: opened output." << std::endl;
     
-  }
-
-  {
-    std::ostringstream oss;
-    oss << "Debug: Do we have an output file: " << fname;
-    debugPrint(oss.str(), arguments.debug_mode);
-  }
-
-  if (!output_file)
+    if (!output_file)
     {
       printf("Failed to open output file for writing: %s\n", strerror(errno));
       Rcpp::Rcerr << "Error: Failed to open output file for writing: " << strerror(errno) << std::endl;
-      debugPrint("Debug: output file DNE", arguments.debug_mode);
+      debugPrint("Debug: output file could not be opened", arguments.debug_mode);
       return 1;
     }else{
         debugPrint("Debug: File opened successfully", arguments.debug_mode);
     }
+  }
+
+  
   // Rcpp::Rcout << "Debug: File opened successfully." << std::endl;
   ostringstream output;
 
