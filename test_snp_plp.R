@@ -35,11 +35,11 @@ logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
 ## out = generate_output_file("test", "")
 
-outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped.csv")
+outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped_progressBar.csv")
 
-input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "--p", "-g")
+input_args = c(vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "-p", "-g")
 
-sink(logfile)
+##sink(logfile)
 
 cat("Current run: Try progress bar...")
 cat(paste("\nArgs: ", paste0(input_args, collapse = ", ")))
