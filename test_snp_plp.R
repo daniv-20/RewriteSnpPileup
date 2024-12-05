@@ -35,7 +35,7 @@ logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
 ## out = generate_output_file("test", "")
 
-outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped_AgainstPython.csv")
+outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped_AgainstPython_v2.csv")
 
 qual_args = c("-d", "2500", "-q", "15", "-Q", "20", "-r", "10")
 

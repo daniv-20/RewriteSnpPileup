@@ -228,7 +228,11 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
   {
     Rcpp::Rcout << "Warning: No min-read-counts provided. Defaulting to 0 for all files." << std::endl;
     args.min_read_counts.assign(num_sequence_files, 0); // Default to 0 for all files
-  }
+  }else if (args.min_read_counts.size() == 1)
+{
+    Rcpp::Rcout << "Single min-read-count provided. Using it for all sequence files." << std::endl;
+    args.min_read_counts.assign(num_sequence_files, args.min_read_counts[0]); // Use the single value for all files
+}
   else if (args.min_read_counts.size() < num_sequence_files)
   {
     Rcpp::Rcout << "Warning: Fewer min-read-counts provided than sequence files. Filling with defaults." << std::endl;
