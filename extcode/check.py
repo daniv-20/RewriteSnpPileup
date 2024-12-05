@@ -27,7 +27,8 @@ def compare(python_out_gz, r_out_gz):
 
 ## get csvs
     gc.convert_gzip_to_csv(python_out_gz, python_out)
-    gc.convert_gzip_to_csv(python_out_gz, python_out)
+    if r_out_gz.endswith('.gz'):
+        gc.convert_gzip_to_csv(r_out_gz, r_out)
 
     py = pd.read_csv(python_out, low_memory = False)
     r = pd.read_csv(r_out, low_memory = False)
@@ -47,6 +48,14 @@ def compare(python_out_gz, r_out_gz):
             if col_py in compare_df.columns and col_r in compare_df.columns:
                 # Check if values are different and update 'sus'
                 compare_df['sus'] |= (compare_df[col_py] != compare_df[col_r]).astype(int)
+
+    fixed_cols = ['Chromosome', 'Position']
+    other_columns = [col for col in compare_df.columns if col not in fixed_cols]
+    py_columns = [col for col in other_columns if col.endswith('_py')]
+    r_columns = [col for col in other_columns if col.endswith('_r')]
+    new_order = fixed_cols + [col for pair in zip(py_columns, r_columns) for col in pair] + ['sus']
+    compare_df = compare_df[new_order]
+
     return compare_df
 
 def results_summary(compare_df):
@@ -59,9 +68,11 @@ def main():
     parser = argparse.ArgumentParser(description="Check Results")
     parser.add_argument("-py", "--python", required=True, help="Path to the python output file.")
     parser.add_argument("-r", "--r", required=True, help="Path to the r output file.")
+    parser.add_argument("-o", "--output", required=True, help="Path to the compare output file.")
     args = parser.parse_args()
     compare_df = compare(args.python, args.r)
     results_summary(compare_df)
+    compare_df.to_csv(args.output, index = False)
 
 if __name__ == "__main__":
     main()
