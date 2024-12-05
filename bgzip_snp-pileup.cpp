@@ -227,13 +227,13 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
   if (args.min_read_counts.empty())
   {
     Rcpp::Rcout << "Warning: No min-read-counts provided. Defaulting to 0 for all files." << std::endl;
-    args.min_read_counts.assign(num_sequence_files, 0); // Default to 1 for all files
+    args.min_read_counts.assign(num_sequence_files, 0); // Default to 0 for all files
   }
   else if (args.min_read_counts.size() < num_sequence_files)
   {
     Rcpp::Rcout << "Warning: Fewer min-read-counts provided than sequence files. Filling with defaults." << std::endl;
     size_t missing_count = num_sequence_files - args.min_read_counts.size();
-    args.min_read_counts.insert(args.min_read_counts.end(), missing_count, 0); // Fill with 1
+    args.min_read_counts.insert(args.min_read_counts.end(), missing_count, 0); // Fill with 0
   }
   else if (args.min_read_counts.size() > num_sequence_files)
   {
@@ -482,7 +482,8 @@ if (!bgzf) {
     // Start pileup engine
      debugPrint("Debug: Start pileup engine", arguments.debug_mode);
     iter = bam_mplp_init(n, mplp_func, (void **)data);
-    if (!arguments.ignore_overlaps) {
+    if (!arguments.ignore_overlaps) 
+    {
         bam_mplp_init_overlaps(iter);
     }
     bam_mplp_set_maxcnt(iter, arguments.max_depth);
@@ -582,22 +583,22 @@ if (!bgzf) {
   std::string header = output.str();
 
 // 04DEC - see if this changes things
-
-if (arguments.gzipped) {
-    ssize_t written = bgzf_write(arguments.gzippedPointer, header.c_str(), header.size());
-    if (written != static_cast<ssize_t>(header.size())) {
-        Rcpp::Rcerr << "Error: Failed to write the complete header to gzipped file." << std::endl;
-    } else {
-        debugPrint("Debug: Header written successfully to gzipped file", arguments.debug_mode);
-    }
-} else {
-    size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
-    if (written != header.size()) {
-        Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
-    } else {
-        debugPrint("Debug: Header written successfully to file", arguments.debug_mode);
-    }
-}
+// 05DEC -> this whole bit might be unneccessary
+// if (arguments.gzipped) {
+//     ssize_t written = bgzf_write(arguments.gzippedPointer, header.c_str(), header.size());
+//     if (written != static_cast<ssize_t>(header.size())) {
+//         Rcpp::Rcerr << "Error: Failed to write the complete header to gzipped file." << std::endl;
+//     } else {
+//         debugPrint("Debug: Header written successfully to gzipped file", arguments.debug_mode);
+//     }
+// } else {
+//     size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
+//     if (written != header.size()) {
+//         Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
+//     } else {
+//         debugPrint("Debug: Header written successfully to file", arguments.debug_mode);
+//     }
+// }
 
 
   // size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
@@ -618,7 +619,7 @@ if (arguments.gzipped) {
   }
   else
   {
-    Rcpp::Rcerr << "Error: outFunc is not initialized." << std::endl;
+    Rcpp::Rcerr << "Error: outFunc is not initialized. No output can be written" << std::endl;
   }
 
     // Process VCF records

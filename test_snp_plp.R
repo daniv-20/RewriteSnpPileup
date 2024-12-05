@@ -37,7 +37,7 @@ logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
 outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "TestGzipped_AgainstPython.csv")
 
-qual_args = c("-d", "2500", "-q", "15", "-Q", "20")
+qual_args = c("-d", "2500", "-q", "15", "-Q", "20", "-r", "10")
 
 input_args = c(qual_args, vcf, outfile, file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_BL10.bam"), "-p", "-g")
 
