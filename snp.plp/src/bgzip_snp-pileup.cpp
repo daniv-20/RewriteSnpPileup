@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include "snp-pileup-rev.h"
+#include "../inst/include/snp-pileup-rev.h"
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -909,8 +909,8 @@ void run_snp_pileup(const std::vector<std::string> &input_args)
 // [[Rcpp::export]]
 void htslib_version()
 {
-  Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
-  Rcpp::Rcout << "HTSlib version:" << hts_version() << HTS_VERSION << std::endl;
+  //Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
+  Rcpp::Rcout << "HTSlib version:" << hts_version()  << std::endl;
 }
 
 
