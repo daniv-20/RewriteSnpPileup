@@ -879,7 +879,7 @@ if (arguments.gzipped)
 //' @return None.
 //' @export
 // [[Rcpp::export]]
-void run_snp_pileup(const std::vector<std::string> &input_args)
+void run_snp_pileup_logic(const std::vector<std::string> &input_args)
 {
   arguments args;
 
