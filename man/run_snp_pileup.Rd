@@ -24,9 +24,9 @@ run_snp_pileup(
 \arguments{
 \item{output}{Output file path.}
 
-\item{file}{Input file path (e.g., VCF file).}
+\item{bamfiles}{Vector of bamfile paths.}
 
-\item{threads}{Number of threads to use. Default is 1.}
+\item{file}{Input file path (e.g., VCF file).}
 }
 \value{
 None. Results are written to the output file.
