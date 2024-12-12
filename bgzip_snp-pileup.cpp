@@ -586,36 +586,6 @@ if (!bgzf) {
   // Write header to file -> does this need to be different for gzip???
   std::string header = output.str();
 
-// 04DEC - see if this changes things
-// 05DEC -> this whole bit might be unneccessary
-// if (arguments.gzipped) {
-//     ssize_t written = bgzf_write(arguments.gzippedPointer, header.c_str(), header.size());
-//     if (written != static_cast<ssize_t>(header.size())) {
-//         Rcpp::Rcerr << "Error: Failed to write the complete header to gzipped file." << std::endl;
-//     } else {
-//         debugPrint("Debug: Header written successfully to gzipped file", arguments.debug_mode);
-//     }
-// } else {
-//     size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
-//     if (written != header.size()) {
-//         Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
-//     } else {
-//         debugPrint("Debug: Header written successfully to file", arguments.debug_mode);
-//     }
-// }
-
-
-  // size_t written = fwrite(header.c_str(), sizeof(char), header.size(), output_file);
-  // if (written != header.size())
-  // {
-  //   Rcpp::Rcerr << "Error: Failed to write the complete header to file." << std::endl;
-  // }
-  // else
-  // {
-  //   // Rcpp::Rcout << "Debug: Header written successfully." << std::endl;
-  //   debugPrint("Debug: header written successfully", arguments.debug_mode);
-  // }
-
   // check on outfunc
   if (arguments.outFunc != nullptr)
   {
@@ -779,14 +749,7 @@ float last_progress = 100.0;
                     is_not_zero = true;
                 }
                 f_info.push_back(this_file);
-          //                 {
-          //   std::ostringstream oss;
-          //   oss << "Debug: File " << i + 1 << " processed. Refs="
-          //       << this_file.refs << ", Alts=" << this_file.alts
-          //       << ", Errors=" << this_file.errors
-          //       << ", Deletions=" << this_file.deletions;
-          //   debugPrint(oss.str(), arguments.debug_mode);
-          // }
+
             }
 
           debugPrint("Debug: end for loop, start print output", arguments.debug_mode);
