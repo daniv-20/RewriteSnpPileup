@@ -6,7 +6,6 @@
 #' @param output Output file path.
 #' @param threads Number of threads to use. Default is 1.
 #' @return None. Results are written to the output file.
-#' @examples
 #' @export
 run_snp_pileup <- function(vcffile, 
   output, 
@@ -53,5 +52,5 @@ debug_mode = FALSE
     
     # Convert to a list and call the underlying C++ function
     args <- c(qual_args, vcffile, output, bamfiles)
-    .Call("_snp.plp_run_snp_pileup_logic", args)
+    .Call("_snp_plp_run_snp_pileup_logic", args)
 }

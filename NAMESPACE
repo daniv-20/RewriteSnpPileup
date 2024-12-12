@@ -2,5 +2,6 @@
 
 export(htslib_version)
 export(run_snp_pileup)
+export(run_snp_pileup_logic)
 importFrom(Rcpp,sourceCpp)
 useDynLib(snp.plp, .registration = TRUE)

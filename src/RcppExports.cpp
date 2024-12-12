@@ -10,13 +10,13 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// run_snp_pileup
-void run_snp_pileup(const std::vector<std::string>& input_args);
-RcppExport SEXP _snp_plp_run_snp_pileup(SEXP input_argsSEXP) {
+// run_snp_pileup_logic
+void run_snp_pileup_logic(const std::vector<std::string>& input_args);
+RcppExport SEXP _snp_plp_run_snp_pileup_logic(SEXP input_argsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<std::string>& >::type input_args(input_argsSEXP);
-    run_snp_pileup(input_args);
+    run_snp_pileup_logic(input_args);
     return R_NilValue;
 END_RCPP
 }
@@ -31,7 +31,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_snp_plp_run_snp_pileup", (DL_FUNC) &_snp_plp_run_snp_pileup, 1},
+    {"_snp_plp_run_snp_pileup_logic", (DL_FUNC) &_snp_plp_run_snp_pileup_logic, 1},
     {"_snp_plp_htslib_version", (DL_FUNC) &_snp_plp_htslib_version, 0},
     {NULL, NULL, 0}
 };
