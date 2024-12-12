@@ -8,23 +8,11 @@ source("/home/nfs/vaithid1/FACETS/RewriteSnpPileup/idl.R")
 
 print(system.file(package = "Rhtslib"))
 
+
+library(snp.plp)
+
 ##BiocManager::install("Rhtslib")
-
-temp_makevars <- tempfile()
-file.create(temp_makevars)
-
-Sys.setenv(R_MAKEVARS_USER = temp_makevars)
-
-# Set the PKG_CPPFLAGS and PKG_LIBS explicitly for this compilation -> link to rhtslib
-# Sys.setenv(
-#  PKG_CPPFLAGS = "-I\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.4/Rhtslib/include\"",
-#  PKG_LIBS = "-L\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.4/Rhtslib/usrlib\" -lhts"
-# )
-
-Sys.setenv(
-  PKG_CPPFLAGS = "-I/opt/R/4.4.1/lib/R/site-library/Rhtslib/include",
-  PKG_LIBS = "-L/opt/R/4.4.1/lib/R/site-library/Rhtslib/usrlib -lhts"
- )
+#devtools::install_github("daniv-20/RewriteSnpPileup", ref="gh_build")
 
 ## get ready for testiiiiing
 datapath = "/ebfs/epibio/seshanv/snp-pileup"
@@ -40,7 +28,7 @@ logfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "Logs", log)
 
 ## out = generate_output_file("test", "")
 
-outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "ArgsTestR2.csv")
+outfile = file.path("/home/nfs/vaithid1/FACETS/RewriteSnpPileup", "outputs", "ArgsTest_gh_snpplp.csv")
 
 qual_args = c("-d", "2500", "-q", "15", "-Q", "20", "-r", "10")
 
@@ -52,9 +40,9 @@ cat("Current run: Try progress bar...")
 cat(paste("\nArgs: ", paste0(input_args, collapse = ", ")))
 
 # Compile the file using sourceCpp
-Rcpp::sourceCpp("bgzip_snp-pileup.cpp", rebuild = TRUE, verbose = TRUE)
+Rhtslib:::htsVersion()
 
-htslib_version()
+snp.plp::htslib_version()
 
 delete_if_exists(outfile)
 

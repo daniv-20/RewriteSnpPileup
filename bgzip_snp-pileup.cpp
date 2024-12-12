@@ -13,7 +13,7 @@ using namespace Rcpp;
 // #include <htslib/sam.h>
 // #include <htslib/bgzf.h>
 // #include <htslib/vcf.h>
-// #include <htslib/hts.h>
+#include <htslib/hts.h>
 
 // Define the arguments structure
 #ifndef SNP_PILEUP_REV_H_DEFINED
@@ -911,6 +911,9 @@ void htslib_version()
 {
   Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
   Rcpp::Rcout << "HTSlib version:" << hts_version() << std::endl;
+  Rcpp::Rcout << "Try HTS_VERSION: "<< HTS_VERSION << std::endl;
+    Rcpp::Rcout << "Try pkg_VERSION: "<< PACKAGE_VERSION << std::endl;
+  //Rcpp::Rcout << "Try VERSION: "<< VERSION << std::endl;
 }
 
 
