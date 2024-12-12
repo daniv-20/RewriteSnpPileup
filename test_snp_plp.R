@@ -2,9 +2,9 @@ rm(list = ls())
 
 getwd()
 
-setwd("/home/nfs/vaithid1/FACETS/RewriteSnpPileup")
+##setwd("/home/nfs/vaithid1/FACETS/RewriteSnpPileup")
 
-source("/home/nfs/vaithid1/FACETS/RewriteSnpPileup/idl.R")
+source("./idl.R")
 
 print(system.file(package = "Rhtslib"))
 
@@ -16,10 +16,15 @@ file.create(temp_makevars)
 Sys.setenv(R_MAKEVARS_USER = temp_makevars)
 
 # Set the PKG_CPPFLAGS and PKG_LIBS explicitly for this compilation -> link to rhtslib
+# Sys.setenv(
+#  PKG_CPPFLAGS = "-I\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.4/Rhtslib/include\"",
+#  PKG_LIBS = "-L\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.4/Rhtslib/usrlib\" -lhts"
+# )
+
 Sys.setenv(
- PKG_CPPFLAGS = "-I\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.4/Rhtslib/include\"",
- PKG_LIBS = "-L\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.4/Rhtslib/usrlib\" -lhts"
-)
+  PKG_CPPFLAGS = "-I\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.3/Rhtslib/include\"",
+  PKG_LIBS = "-L\"/home/nfs/vaithid1/R/x86_64-pc-linux-gnu-library/4.3/Rhtslib/usrlib\" -lhts"
+ )
 
 ## get ready for testiiiiing
 datapath = "/ebfs/epibio/seshanv/snp-pileup"
