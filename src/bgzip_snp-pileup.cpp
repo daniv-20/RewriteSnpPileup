@@ -39,78 +39,88 @@ struct arguments
 #endif
 
 // Function to read and parse the header
-bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns) {
-    kstring_t line = {0, 0, NULL};
-    bool header_found = false;
-    //size_t len = 0;
+bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
+{
+  kstring_t line = {0, 0, NULL};
+  bool header_found = false;
+  // size_t len = 0;
 
-    Rcpp::Rcout << "Debug: Entering read_vcf_header function" << std::endl;
+  Rcpp::Rcout << "Debug: Entering read_vcf_header function" << std::endl;
 
-    while (bgzf_getline(bgzf, '\n', &line) >= 0) {
-        // Check if it's a header line
-        Rcpp::Rcout << "Debug: Read line: " << line.s << std::endl;
-        if (line.s[0] == '#') {
-            // Check for the #CHROM line (last header line)
-            Rcpp::Rcout << "Debug: Line is a header line" << std::endl;
-            if (strncmp(line.s, "#CHROM", 6) == 0) {
-                // Parse the #CHROM line into columns
-                std::string header_line(line.s);
-                Rcpp::Rcout << "Debug: Found #CHROM line" << std::endl;
-                // Debug: Print the header line
-                Rcpp::Rcout << "Debug: Header line content: " << header_line << std::endl;
+  while (bgzf_getline(bgzf, '\n', &line) >= 0)
+  {
+    // Check if it's a header line
+    Rcpp::Rcout << "Debug: Read line: " << line.s << std::endl;
+    if (line.s[0] == '#')
+    {
+      // Check for the #CHROM line (last header line)
+      Rcpp::Rcout << "Debug: Line is a header line" << std::endl;
+      if (strncmp(line.s, "#CHROM", 6) == 0)
+      {
+        // Parse the #CHROM line into columns
+        std::string header_line(line.s);
+        Rcpp::Rcout << "Debug: Found #CHROM line" << std::endl;
+        // Debug: Print the header line
+        Rcpp::Rcout << "Debug: Header line content: " << header_line << std::endl;
 
-                std::istringstream iss(header_line);
-                std::string column;
-
-                while (std::getline(iss, column, '\t')) {
-                    columns.push_back(column);
-                     Rcpp::Rcout << "Debug: Parsed column: " << column << std::endl;
-                }
-
-                 if (columns.size() != 4) {
-                Rcpp::Rcerr << "Error: Expected 4 columns, but parsed " << columns.size() << " columns." << std::endl;
-                return false;
-            }
-                header_found = true;
-                break;
-
-                // Debug: Check the number of columns parsed
-           
-
-                free(line.s); // Clean up
-                return true; // Header successfully read
-            }
-        } else {
-            break; // Stop at the first non-header line
-        }
-    }
-
-    if (!header_found) {
-        // File does not have a #CHROM line, check the first non-header line for format
-        std::string first_line(line.s);
-        std::istringstream iss(first_line);
+        std::istringstream iss(header_line);
         std::string column;
-        int column_count = 0;
 
-        while (std::getline(iss, column, '\t')) {
-            columns.push_back(column);
-            column_count++;
+        while (std::getline(iss, column, '\t'))
+        {
+          columns.push_back(column);
+          Rcpp::Rcout << "Debug: Parsed column: " << column << std::endl;
         }
 
-        if (column_count != 4) {
-            Rcpp::Rcerr << "Error: File does not have a header and the first line is not in 4-column format." << std::endl;
-            free(line.s);
-            return false;
+        if (columns.size() != 4)
+        {
+          Rcpp::Rcerr << "Error: Expected 4 columns, but parsed " << columns.size() << " columns." << std::endl;
+          return false;
         }
+        header_found = true;
+        break;
 
-        // Warn and continue
-        Rcpp::Rcout << "Warning: File does not have a header but appears to be in correct 4-column format. Continuing." << std::endl;
+        // Debug: Check the number of columns parsed
+
         free(line.s); // Clean up
-        return true; // Header successfully read    
+        return true;  // Header successfully read
+      }
+    }
+    else
+    {
+      break; // Stop at the first non-header line
+    }
+  }
+
+  if (!header_found)
+  {
+    // File does not have a #CHROM line, check the first non-header line for format
+    std::string first_line(line.s);
+    std::istringstream iss(first_line);
+    std::string column;
+    int column_count = 0;
+
+    while (std::getline(iss, column, '\t'))
+    {
+      columns.push_back(column);
+      column_count++;
     }
 
-    free(line.s);
-    return false; // No valid #CHROM line found
+    if (column_count != 4)
+    {
+      Rcpp::Rcerr << "Error: File does not have a header and the first line is not in 4-column format." << std::endl;
+      free(line.s);
+      return false;
+    }
+
+    // Warn and continue
+    Rcpp::Rcout << "Warning: File does not have a header but appears to be in correct 4-column format. Continuing." << std::endl;
+    free(line.s); // Clean up
+    return true;  // Header successfully read
+  }
+
+  free(line.s);
+  return false; // No valid #CHROM line found
 }
 
 // Parse arguments from R inputs
@@ -142,9 +152,8 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
-        //Rcpp::Rcout << "Debug: mbc" << input_args[i] << std::endl;
+        // Rcpp::Rcout << "Debug: mbc" << input_args[i] << std::endl;
         args.min_base_quality = std::stoi(input_args[i]);
-
       }
       else
       {
@@ -155,7 +164,7 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
-        //Rcpp::Rcout << "Debug: mmc" << input_args[i] << std::endl;
+        // Rcpp::Rcout << "Debug: mmc" << input_args[i] << std::endl;
         args.min_map_quality = std::stoi(input_args[i]);
       }
       else
@@ -183,7 +192,7 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
-        //Rcpp::Rcout << "Debug: md " << input_args[i] << std::endl;
+        // Rcpp::Rcout << "Debug: md " << input_args[i] << std::endl;
         args.max_depth = std::stoi(input_args[i]);
       }
       else
@@ -199,7 +208,7 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
-        //Rcpp::Rcout << "Debug: ps" << input_args[i] << std::endl;
+        // Rcpp::Rcout << "Debug: ps" << input_args[i] << std::endl;
         args.pseudo_snps = std::stoi(input_args[i]);
       }
       else
@@ -233,11 +242,12 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
   {
     Rcpp::Rcout << "Warning: No min-read-counts provided. Defaulting to 0 for all files." << std::endl;
     args.min_read_counts.assign(num_sequence_files, 0); // Default to 0 for all files
-  }else if (args.min_read_counts.size() == 1)
-{
+  }
+  else if (args.min_read_counts.size() == 1)
+  {
     Rcpp::Rcout << "Single min-read-count provided. Using it for all sequence files." << std::endl;
     args.min_read_counts.assign(num_sequence_files, args.min_read_counts[0]); // Use the single value for all files
-}
+  }
   else if (args.min_read_counts.size() < num_sequence_files)
   {
     Rcpp::Rcout << "Warning: Fewer min-read-counts provided than sequence files. Filling with defaults." << std::endl;
@@ -376,29 +386,32 @@ uint64_t get_snp_count(char *file)
 {
   // Rcpp::Rcout << "Debug: entered get snp count" << std::endl;
   uint64_t count = 0;
-  //Open BGZF compressed vcf file in read mode
-    BGZF *bgzf = bgzf_open(file, "r");
-    if(!bgzf){
-        std::cerr << "Failed to open BGZF file: " << file << std::endl;
-        return -1; // return -1 if there is an error
-    }
+  // Open BGZF compressed vcf file in read mode
+  BGZF *bgzf = bgzf_open(file, "r");
+  if (!bgzf)
+  {
+    std::cerr << "Failed to open BGZF file: " << file << std::endl;
+    return -1; // return -1 if there is an error
+  }
 
   // Buffer for reading lines
   kstring_t line = {0, 0, NULL}; // Initialize kstring_t
-  //size_t len = 0;
+  // size_t len = 0;
 
   // read lines from BGZF file
-  while(bgzf_getline(bgzf, '\n', &line) >= 0){ // reaD A SINGLE LINE FROM BGZF FILE UNTIL newline character, store line in provided buffer 'line'
+  while (bgzf_getline(bgzf, '\n', &line) >= 0)
+  { // reaD A SINGLE LINE FROM BGZF FILE UNTIL newline character, store line in provided buffer 'line'
     // ignore header lines (start with #)
-    if(line.s[0] != '#'){
-        count ++;
+    if (line.s[0] != '#')
+    {
+      count++;
     }
   }
-// clean up
-free(line.s); // free the allocated line buffer
-bgzf_close(bgzf); // close the bgzf handle
+  // clean up
+  free(line.s);     // free the allocated line buffer
+  bgzf_close(bgzf); // close the bgzf handle
 
-return count;
+  return count;
 }
 
 int program_main(arguments arguments)
@@ -420,27 +433,29 @@ int program_main(arguments arguments)
   // Load VCF file
   debugPrint("Debug: About to load vcf file", arguments.debug_mode);
 
-// open file
+  // open file
   BGZF *bgzf = bgzf_open(arguments.args[0].c_str(), "r");
-if (!bgzf) {
+  if (!bgzf)
+  {
     std::cerr << "Failed to open BGZF file: " << arguments.args[0] << std::endl;
     return 1;
-}
+  }
 
   // Read and validate the VCF header
-    std::vector<std::string> header_columns;
-    if (!read_vcf_header(bgzf, header_columns)) {
+  std::vector<std::string> header_columns;
+  if (!read_vcf_header(bgzf, header_columns))
+  {
 
-        Rcpp::Rcout << "Attempted to read header and failed: " << read_vcf_header(bgzf, header_columns)<< std::endl;
+    Rcpp::Rcout << "Attempted to read header and failed: " << read_vcf_header(bgzf, header_columns) << std::endl;
 
-        std::cerr << "Invalid or missing VCF header in file: " << arguments.args[0] << std::endl;
-        bgzf_close(bgzf);
-        return 1;
-    }
+    std::cerr << "Invalid or missing VCF header in file: " << arguments.args[0] << std::endl;
+    bgzf_close(bgzf);
+    return 1;
+  }
 
   debugPrint("Debug: Loaded vcf file", arguments.debug_mode);
 
-  //calculate snp count for progress tracking
+  // calculate snp count for progress tracking
   uint64_t count = 0;
   if (arguments.progress)
   {
@@ -450,23 +465,26 @@ if (!bgzf) {
   }
 
   debugPrint("Debug: Construct BAM Data to pass to pileup engine", arguments.debug_mode);
-  //Initialize BAM file data
-      mplp_aux_t **data = (mplp_aux_t **)calloc(n, sizeof(mplp_aux_t *));
-    for (i = 0; i < n; ++i) {
-        data[i] = (mplp_aux_t *)calloc(1, sizeof(mplp_aux_t));
+  // Initialize BAM file data
+  mplp_aux_t **data = (mplp_aux_t **)calloc(n, sizeof(mplp_aux_t *));
+  for (i = 0; i < n; ++i)
+  {
+    data[i] = (mplp_aux_t *)calloc(1, sizeof(mplp_aux_t));
 
-        // open file
-        hFILE *hfp = hopen(arguments.args[i + 2].c_str(), "r");
-        if (!hfp) {
-            std::cerr << "Failed to open BAM file: " << arguments.args[i + 2] << std::endl;
-            return 1;
-        }
+    // open file
+    hFILE *hfp = hopen(arguments.args[i + 2].c_str(), "r");
+    if (!hfp)
+    {
+      std::cerr << "Failed to open BAM file: " << arguments.args[i + 2] << std::endl;
+      return 1;
+    }
 
-        // ommitting detect file format because ... ??? 
+    // ommitting detect file format because ... ???
 
-        data[i]->fp = hts_hopen(hfp, arguments.args[i + 2].c_str(), "rb");
-        if (!data[i]->fp) {
-            // Error handling: Couldn't open the file
+    data[i]->fp = hts_hopen(hfp, arguments.args[i + 2].c_str(), "rb");
+    if (!data[i]->fp)
+    {
+      // Error handling: Couldn't open the file
       std::cerr << "Couldn't open sequence file: " << arguments.args[i + 2]
                 << " (" << strerror(errno) << ")" << std::endl;
       // hclose(hfp); // Clean up the file handle
@@ -475,34 +493,34 @@ if (!bgzf) {
         // Handle the error, e.g., log an error message or throw an exception.
         std::cerr << "Error: Failed to close file handle." << std::endl;
       }
-            return 1;
-        }
-      
-        hts_set_opt(data[i]->fp, CRAM_OPT_DECODE_MD, 0); 
-
-        data[i]->conf = conf;
-        data[i]->h = sam_hdr_read(data[i]->fp);
-        data[i]->ref = &mp_ref;
+      return 1;
     }
 
-     // Read BAM header
-    bam_hdr_t *hdr = data[0]->h;
+    hts_set_opt(data[i]->fp, CRAM_OPT_DECODE_MD, 0);
 
-    // Start pileup engine
-     debugPrint("Debug: Start pileup engine", arguments.debug_mode);
-    iter = bam_mplp_init(n, mplp_func, (void **)data);
-    if (!arguments.ignore_overlaps) 
-    {
-        bam_mplp_init_overlaps(iter);
-    }
-    bam_mplp_set_maxcnt(iter, arguments.max_depth);
+    data[i]->conf = conf;
+    data[i]->h = sam_hdr_read(data[i]->fp);
+    data[i]->ref = &mp_ref;
+  }
 
-    if (arguments.verbose)
+  // Read BAM header
+  bam_hdr_t *hdr = data[0]->h;
+
+  // Start pileup engine
+  debugPrint("Debug: Start pileup engine", arguments.debug_mode);
+  iter = bam_mplp_init(n, mplp_func, (void **)data);
+  if (!arguments.ignore_overlaps)
+  {
+    bam_mplp_init_overlaps(iter);
+  }
+  bam_mplp_set_maxcnt(iter, arguments.max_depth);
+
+  if (arguments.verbose)
   {
     printf("Max per-file depth set to %d.\n", arguments.max_depth);
   }
 
-  // setup output file 
+  // setup output file
 
   string fname = string(arguments.args[1]);
   if (arguments.gzipped)
@@ -541,9 +559,10 @@ if (!bgzf) {
   if (arguments.gzipped)
   {
     arguments.gzippedPointer = bgzf_open(fname.c_str(), "w+");
-    if (!arguments.gzippedPointer) {
-        Rcpp::Rcerr << "Error: Failed to open gzipped output file." << std::endl;
-        return 1;
+    if (!arguments.gzippedPointer)
+    {
+      Rcpp::Rcerr << "Error: Failed to open gzipped output file." << std::endl;
+      return 1;
     }
     debugPrint("Debug: opened gzipped file", arguments.debug_mode);
   }
@@ -554,19 +573,20 @@ if (!bgzf) {
     output_file = fopen(fname.c_str(), "w+");
     debugPrint("Debug: opened output", arguments.debug_mode);
     // Rcpp::Rcout << "Debug: opened output." << std::endl;
-    
+
     if (!output_file)
     {
       printf("Failed to open output file for writing: %s\n", strerror(errno));
       Rcpp::Rcerr << "Error: Failed to open output file for writing: " << strerror(errno) << std::endl;
       debugPrint("Debug: output file could not be opened", arguments.debug_mode);
       return 1;
-    }else{
-        debugPrint("Debug: File opened successfully", arguments.debug_mode);
+    }
+    else
+    {
+      debugPrint("Debug: File opened successfully", arguments.debug_mode);
     }
   }
 
-  
   // Rcpp::Rcout << "Debug: File opened successfully." << std::endl;
   ostringstream output;
 
@@ -601,105 +621,117 @@ if (!bgzf) {
     Rcpp::Rcerr << "Error: outFunc is not initialized. No output can be written" << std::endl;
   }
 
-    // Process VCF records
-      debugPrint("Debug: go thru it", arguments.debug_mode);
+  // Process VCF records
+  debugPrint("Debug: go thru it", arguments.debug_mode);
   int ret;
   int tid, pos;
   vector<file_info> f_info = vector<file_info>();
   bool first = true;
-    kstring_t line = {0, 0, NULL};
-    uint64_t current_count = 0;
-float last_progress = 100.0;
+  kstring_t line = {0, 0, NULL};
+  uint64_t current_count = 0;
+  float last_progress = 100.0;
   bool have_snpped = false;
-      debugPrint("Debug: ready to loop", arguments.debug_mode);
-    while (bgzf_getline(bgzf, '\n', &line) >= 0) {
-        // Skip header lines
-       // debugPrint("Debug: in the loop, no parse yet", arguments.debug_mode);
-        if (line.s[0] == '#') continue;
+  debugPrint("Debug: ready to loop", arguments.debug_mode);
+  while (bgzf_getline(bgzf, '\n', &line) >= 0)
+  {
+    // Skip header lines
+    // debugPrint("Debug: in the loop, no parse yet", arguments.debug_mode);
+    if (line.s[0] == '#')
+      continue;
 
-        // Parse the record
-        std::istringstream iss(line.s);
-        std::vector<std::string> fields;
-        std::string field;
+    // Parse the record
+    std::istringstream iss(line.s);
+    std::vector<std::string> fields;
+    std::string field;
 
-       // debugPrint("Debug: did parse", arguments.debug_mode);
-        
+    // debugPrint("Debug: did parse", arguments.debug_mode);
 
-        while (std::getline(iss, field, '\t')) {
-            fields.push_back(field);
-            //debugPrint("Debug: in field while", arguments.debug_mode);
-            //debugPrint(field, arguments.debug_mode);
-        }
+    while (std::getline(iss, field, '\t'))
+    {
+      fields.push_back(field);
+      // debugPrint("Debug: in field while", arguments.debug_mode);
+      // debugPrint(field, arguments.debug_mode);
+    }
 
-        // Validate record
-        if (fields.size() < 4) {
-            std::cerr << "Malformed VCF record: " << line.s << std::endl;
-            continue;
-        }
+    // Validate record
+    if (fields.size() < 4)
+    {
+      std::cerr << "Malformed VCF record: " << line.s << std::endl;
+      continue;
+    }
 
-        // Extract fields
-        //debugPrint("Debug: extracting fields", arguments.debug_mode);
+    // Extract fields
+    // debugPrint("Debug: extracting fields", arguments.debug_mode);
 
-//         {
-//     std::ostringstream oss;
-//     oss << "Debug: Fields: ";
+    //         {
+    //     std::ostringstream oss;
+    //     oss << "Debug: Fields: ";
 
-//     // Check if fields is a container
-//     for (const auto &field : fields) {
-//         oss << field << " ";
-//     }
+    //     // Check if fields is a container
+    //     for (const auto &field : fields) {
+    //         oss << field << " ";
+    //     }
 
-//     debugPrint(oss.str(), arguments.debug_mode);
-// }
+    //     debugPrint(oss.str(), arguments.debug_mode);
+    // }
 
-        std::string chrom = fields[0];
-        //debugPrint(chrom, arguments.debug_mode);
-        //Rcpp::Rcout << "Debug int vcf_pos: " << fields[1] << std::endl; 
-        int vcf_pos = std::stoi(fields[1]);
-        std::string ref = fields[2];
-        //debugPrint(ref, arguments.debug_mode);
-        std::string alt = fields[3];
-       // debugPrint(alt, arguments.debug_mode);
+    std::string chrom = fields[0];
+    // debugPrint(chrom, arguments.debug_mode);
+    // Rcpp::Rcout << "Debug int vcf_pos: " << fields[1] << std::endl;
+    int vcf_pos = std::stoi(fields[1]);
+    std::string ref = fields[2];
+    // debugPrint(ref, arguments.debug_mode);
+    std::string alt = fields[3];
+    // debugPrint(alt, arguments.debug_mode);
 
-       // debugPrint("Debug: extracted fields", arguments.debug_mode);
+    // debugPrint("Debug: extracted fields", arguments.debug_mode);
 
     // Filter for SNPs (single nucleotide variants only)
-    if (ref.size() != 1 || alt.size() != 1) {
-        debugPrint("Skipping non-SNP record: " + std::string(line.s), arguments.debug_mode);
-        continue;
+    if (ref.size() != 1 || alt.size() != 1)
+    {
+      debugPrint("Skipping non-SNP record: " + std::string(line.s), arguments.debug_mode);
+      continue;
     }
-      // Map VCF chromosome and position to BAM target indices
-        char chrom_buffer[chrom.size() + 1];
-        std::strcpy(chrom_buffer, chrom.c_str()); // copy string into mutable buffer
+    // Map VCF chromosome and position to BAM target indices
+    char chrom_buffer[chrom.size() + 1];
+    std::strcpy(chrom_buffer, chrom.c_str()); // copy string into mutable buffer
 
-        int vcf_tid = vcf_chr_to_bam(chrom_buffer, hdr->target_name, hdr->n_targets);
+    int vcf_tid = vcf_chr_to_bam(chrom_buffer, hdr->target_name, hdr->n_targets);
     current_count++;
 
     // track progress
     float progress = ((float)current_count / count);
-    if (arguments.progress && (int)(last_progress * 100) != (int)(progress * 100)) 
+    if (arguments.progress && (int)(last_progress * 100) != (int)(progress * 100))
     {
-        int barWidth = 70;
-        std::cout << "[";
-        int pos = barWidth * progress;
-        for (int i = 0; i < barWidth; ++i) {
-            if (i < pos) std::cout << "=";
-            else if (i == pos) std::cout << ">";
-            else std::cout << " ";
-        }
-              std::cout << "] " << int(progress * 100.0) << " %\r";
-        std::cout.flush();
-        last_progress = progress;
+      int barWidth = 70;
+      std::cout << "[";
+      int pos = barWidth * progress;
+      for (int i = 0; i < barWidth; ++i)
+      {
+        if (i < pos)
+          std::cout << "=";
+        else if (i == pos)
+          std::cout << ">";
+        else
+          std::cout << " ";
+      }
+      std::cout << "] " << int(progress * 100.0) << " %\r";
+      std::cout.flush();
+      last_progress = progress;
     }
 
-  // plp processing loop
- while ((ret = bam_mplp_auto(iter, &tid, &pos, n_plp, plp)) > 0) {
-        if (!first && tid > vcf_tid) continue; // Skip ahead if pileup is beyond VCF tid
-        if (!first && tid == vcf_tid && pos < vcf_pos) continue; // Skip if position is earlier
-        
-        //moving forward....
-        if (tid == vcf_tid && pos == vcf_pos) {
-            debugPrint("Debug: Found matching SNP position!", arguments.debug_mode);
+    // plp processing loop
+    while ((ret = bam_mplp_auto(iter, &tid, &pos, n_plp, plp)) > 0)
+    {
+      if (!first && tid > vcf_tid)
+        continue; // Skip ahead if pileup is beyond VCF tid
+      if (!first && tid == vcf_tid && pos < vcf_pos)
+        continue; // Skip if position is earlier
+
+      // moving forward....
+      if (tid == vcf_tid && pos == vcf_pos)
+      {
+        debugPrint("Debug: Found matching SNP position!", arguments.debug_mode);
 
         //  {
         //         std::ostringstream oss;
@@ -710,81 +742,98 @@ float last_progress = 100.0;
         //         debugPrint(oss.str(), arguments.debug_mode);
         //     }
 
-            // Process the pileup data for each file
-            // output data to output file
-            bool is_not_zero = false;
-            bool fails_min = false;
-            for (i = 0; i < n; ++i) {
+        // Process the pileup data for each file
+        // output data to output file
+        bool is_not_zero = false;
+        bool fails_min = false;
+        for (i = 0; i < n; ++i)
+        {
 
-              {
+          {
             std::ostringstream oss;
             oss << "Debug: Processing file" << (i + 1) << " of " << n;
             debugPrint(oss.str(), arguments.debug_mode);
           }
-                file_info this_file = {0, 0, 0, 0}; // Initialize counts
-                if (n_plp[i] >= arguments.min_read_counts[i]) 
-                {
+          file_info this_file = {0, 0, 0, 0}; // Initialize counts
+          if (n_plp[i] >= arguments.min_read_counts[i])
+          {
             //         {
             //   std::ostringstream oss;
             //   oss << "Debug: Sufficient reads for file " << (i + 1);
             //   debugPrint(oss.str(), arguments.debug_mode);
             // }
 
-                    for (int j = 0; j < n_plp[i]; ++j) {
-                        const bam_pileup1_t *p = plp[i] + j;
-                        char base = bam_seqi(bam_get_seq(p->b), p->qpos);
-                        if (p->is_del) {
-                            this_file.deletions++;
-                        } else if (seq_nt16_str[(unsigned int)base] == ref[0]) {
-                            this_file.refs++;
-                        } else if (seq_nt16_str[(unsigned int)base] == alt[0]) {
-                            this_file.alts++;
-                        } else {
-                            this_file.errors++;
-                        }
-                    }
-                } else {
-                  {
+            for (int j = 0; j < n_plp[i]; ++j)
+            {
+              const bam_pileup1_t *p = plp[i] + j;
+              char base = bam_seqi(bam_get_seq(p->b), p->qpos);
+              if (p->is_del)
+              {
+                this_file.deletions++;
+              }
+              else if (seq_nt16_str[(unsigned int)base] == ref[0])
+              {
+                this_file.refs++;
+              }
+              else if (seq_nt16_str[(unsigned int)base] == alt[0])
+              {
+                this_file.alts++;
+              }
+              else
+              {
+                this_file.errors++;
+              }
+            }
+          }
+          else
+          {
+            {
               std::ostringstream oss;
               oss << "Debug: Insufficient reads for file " << i + 1;
               debugPrint(oss.str(), arguments.debug_mode);
             }
-                    fails_min = true;
-                }
-                if (this_file.refs != 0 || this_file.alts != 0 || this_file.errors != 0) {
-                    is_not_zero = true;
-                }
-                f_info.push_back(this_file);
-
-            }
-
-          debugPrint("Debug: end for loop, start print output", arguments.debug_mode);
-
-          // Write the SNP information to the output
-            if (is_not_zero && !fails_min) {
-                output.str("");
-                output.clear();
-                output << chrom << "," << vcf_pos << "," << ref << "," << alt;
-                for (i = 0; i < n; ++i) {
-                    output << "," << f_info[i].refs
-                           << "," << f_info[i].alts
-                           << "," << f_info[i].errors
-                           << "," << f_info[i].deletions;
-                }
-                output << "\n";
-                if (arguments.gzipped) {
-                    if (bgzf_write(arguments.gzippedPointer, output.str().c_str(), output.str().size()) < 0) {
-    std::cerr << "Error writing to BGZF output file" << std::endl;
-    return 1;
-}
-                } else {
-                    fwrite(output.str().c_str(), sizeof(char), output.str().size(), output_file);
-                }
-            }
-            f_info.clear();
-            break;
+            fails_min = true;
+          }
+          if (this_file.refs != 0 || this_file.alts != 0 || this_file.errors != 0)
+          {
+            is_not_zero = true;
+          }
+          f_info.push_back(this_file);
         }
-        if (arguments.pseudo_snps && !have_snpped && (((pos + 1) % arguments.pseudo_snps) == 0))
+
+        debugPrint("Debug: end for loop, start print output", arguments.debug_mode);
+
+        // Write the SNP information to the output
+        if (is_not_zero && !fails_min)
+        {
+          output.str("");
+          output.clear();
+          output << chrom << "," << vcf_pos << "," << ref << "," << alt;
+          for (i = 0; i < n; ++i)
+          {
+            output << "," << f_info[i].refs
+                   << "," << f_info[i].alts
+                   << "," << f_info[i].errors
+                   << "," << f_info[i].deletions;
+          }
+          output << "\n";
+          if (arguments.gzipped)
+          {
+            if (bgzf_write(arguments.gzippedPointer, output.str().c_str(), output.str().size()) < 0)
+            {
+              std::cerr << "Error writing to BGZF output file" << std::endl;
+              return 1;
+            }
+          }
+          else
+          {
+            fwrite(output.str().c_str(), sizeof(char), output.str().size(), output_file);
+          }
+        }
+        f_info.clear();
+        break;
+      }
+      if (arguments.pseudo_snps && !have_snpped && (((pos + 1) % arguments.pseudo_snps) == 0))
       {
         bool is_not_zero = false;
         bool fails_min = false;
@@ -845,26 +894,29 @@ float last_progress = 100.0;
         f_info.clear();
       }
       // Break the loop if the BAM position surpasses the VCF position
-        if (tid > vcf_tid || (tid == vcf_tid && pos > vcf_pos)) {
-            break;
-        }
- }
+      if (tid > vcf_tid || (tid == vcf_tid && pos > vcf_pos))
+      {
+        break;
+      }
     }
+  }
 
-   // Cleanup
-    free(line.s);
-    bgzf_close(bgzf);
-    bam_mplp_destroy(iter);
+  // Cleanup
+  free(line.s);
+  bgzf_close(bgzf);
+  bam_mplp_destroy(iter);
 
-    for (i = 0; i < n; ++i) {
-        if (data[i]->fp) hts_close(data[i]->fp);
-        free(data[i]);
-    }
-    free(data);
+  for (i = 0; i < n; ++i)
+  {
+    if (data[i]->fp)
+      hts_close(data[i]->fp);
+    free(data[i]);
+  }
+  free(data);
 
-    debugPrint("Debug: Completed program_main", arguments.debug_mode);
-    printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
-if (arguments.gzipped)
+  debugPrint("Debug: Completed program_main", arguments.debug_mode);
+  printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
+  if (arguments.gzipped)
   {
     bgzf_close(arguments.gzippedPointer);
   }
@@ -872,7 +924,7 @@ if (arguments.gzipped)
   {
     fclose(output_file);
   }
-    return 0;
+  return 0;
 }
 
 // Expose to Rcpp
@@ -915,9 +967,6 @@ void run_snp_pileup_logic(const std::vector<std::string> &input_args)
 // [[Rcpp::export]]
 void htslib_version()
 {
-  //Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
-  Rcpp::Rcout << "HTSlib version:" << hts_version()  << std::endl;
+  // Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
+  Rcpp::Rcout << "HTSlib version:" << hts_version() << std::endl;
 }
-
-
-
