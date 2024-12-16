@@ -22,11 +22,33 @@ run_snp_pileup(
 )
 }
 \arguments{
+\item{vcffile}{Input file path (e.g., VCF file).}
+
 \item{output}{Output file path.}
 
 \item{bamfiles}{Vector of bamfile paths.}
 
-\item{file}{Input file path (e.g., VCF file).}
+\item{count_orphans}{Do not discard anomalous read paris.}
+
+\item{gzipped}{Compresses the output file with BGZF. If false, output file is CSV.}
+
+\item{ignore_overlaps}{If true, disables read-pair overlap detection.}
+
+\item{min_base_quality}{Sets the minimum threshold for base quality. Default is 0.}
+
+\item{min_map_quality}{Sets the minimum threshold for mapping quality. The default is 0.}
+
+\item{min_read_counts}{Comma separated list of minimum read counts for position to be output. Default is 0.}
+
+\item{max_depth}{Sets the maximum depth. Default is 4000.}
+
+\item{progress}{If true, shows a progress bar. WARNING: requires additional time to calculate number of SNPs, and will take longer than normal.}
+
+\item{psuedo_snps}{Every n positions, if there is no SNP, insert a blank record with the total count at the position.}
+
+\item{verbose}{If true, shows detailed messages.}
+
+\item{debug_mode}{If true, shows many detailed messages.}
 }
 \value{
 None. Results are written to the output file.
