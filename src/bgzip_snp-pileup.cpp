@@ -68,7 +68,7 @@ bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns) {
                 }
 
                  if (columns.size() != 4) {
-                Rcpp::Rcerr << "Warning: Expected 4 columns, but parsed " << columns.size() << " columns." << std::endl;
+                Rcpp::Rcerr << "Error: Expected 4 columns, but parsed " << columns.size() << " columns." << std::endl;
                 return false;
             }
                 header_found = true;
@@ -142,7 +142,9 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
+        //Rcpp::Rcout << "Debug: mbc" << input_args[i] << std::endl;
         args.min_base_quality = std::stoi(input_args[i]);
+
       }
       else
       {
@@ -153,6 +155,7 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
+        //Rcpp::Rcout << "Debug: mmc" << input_args[i] << std::endl;
         args.min_map_quality = std::stoi(input_args[i]);
       }
       else
@@ -180,6 +183,7 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
+        //Rcpp::Rcout << "Debug: md " << input_args[i] << std::endl;
         args.max_depth = std::stoi(input_args[i]);
       }
       else
@@ -195,6 +199,7 @@ void parse_arguments(const std::vector<std::string> &input_args, arguments &args
     {
       if (++i < input_args.size())
       {
+        //Rcpp::Rcout << "Debug: ps" << input_args[i] << std::endl;
         args.pseudo_snps = std::stoi(input_args[i]);
       }
       else
@@ -649,6 +654,7 @@ float last_progress = 100.0;
 
         std::string chrom = fields[0];
         //debugPrint(chrom, arguments.debug_mode);
+        //Rcpp::Rcout << "Debug int vcf_pos: " << fields[1] << std::endl; 
         int vcf_pos = std::stoi(fields[1]);
         std::string ref = fields[2];
         //debugPrint(ref, arguments.debug_mode);
