@@ -8,8 +8,8 @@
 #' @param debug A logical Value. If TRUE will print 'debug' statements.
 #' @return None.
 #' @export
-run_snp_pileup <- function(input_args) {
-    invisible(.Call(`_snp_plp_run_snp_pileup`, input_args))
+run_snp_pileup_logic <- function(input_args) {
+    invisible(.Call(`_snp_plp_run_snp_pileup_logic`, input_args))
 }
 
 #' Check Htslib Version

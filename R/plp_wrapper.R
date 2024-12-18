@@ -105,5 +105,5 @@ if (verbose) {
 
 
 args <- c(qual_args, vcffile, output, bamfiles)
-.Call("_snp.plp_run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
+.Call("_snp_plp_run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
 }
