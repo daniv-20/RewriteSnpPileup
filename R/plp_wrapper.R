@@ -44,7 +44,7 @@ if (!gzipped) {
 for (bamfile in bamfiles) {
   if (!file.exists(bamfile)) stop("Bam file does not exist: ", bamfile)
 }
-if (class(min_read_counts) != "numeric") {
+if (!is.numeric(min_read_counts)) {
   stop(paste0("Error: Min_read_counts is ", class(min_read_counts), ". Min_read_counts must be numeric."))
 }
 user_values <- list(
