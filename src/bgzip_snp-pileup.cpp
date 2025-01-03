@@ -12,6 +12,7 @@ using namespace Rcpp;
 
 
 // Define the arguments structure
+// want to take all of this out and put it in the r code
 #ifndef SNP_PILEUP_REV_H_DEFINED
 #define SNP_PILEUP_REV_H_DEFINED
 struct arguments

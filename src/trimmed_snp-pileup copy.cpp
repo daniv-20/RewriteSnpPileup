@@ -695,26 +695,26 @@ int snp_pileup_main(List arguments)
     int vcf_tid = vcf_chr_to_bam(chrom_buffer, hdr->target_name, hdr->n_targets);
     current_count++;
 
-    // track progress
-    float progress = ((float)current_count / count);
-    if (arguments.progress && (int)(last_progress * 100) != (int)(progress * 100))
-    {
-      int barWidth = 70;
-      std::cout << "[";
-      int pos = barWidth * progress;
-      for (int i = 0; i < barWidth; ++i)
-      {
-        if (i < pos)
-          std::cout << "=";
-        else if (i == pos)
-          std::cout << ">";
-        else
-          std::cout << " ";
-      }
-      std::cout << "] " << int(progress * 100.0) << " %\r";
-      std::cout.flush();
-      last_progress = progress;
-    }
+    // track progress -> removing progress option
+    // float progress = ((float)current_count / count);
+    // if (arguments.progress && (int)(last_progress * 100) != (int)(progress * 100))
+    // {
+    //   int barWidth = 70;
+    //   std::cout << "[";
+    //   int pos = barWidth * progress;
+    //   for (int i = 0; i < barWidth; ++i)
+    //   {
+    //     if (i < pos)
+    //       std::cout << "=";
+    //     else if (i == pos)
+    //       std::cout << ">";
+    //     else
+    //       std::cout << " ";
+    //   }
+    //   std::cout << "] " << int(progress * 100.0) << " %\r";
+    //   std::cout.flush();
+    //   last_progress = progress;
+    // }
 
     // plp processing loop
     while ((ret = bam_mplp_auto(iter, &tid, &pos, n_plp, plp)) > 0)
@@ -912,14 +912,13 @@ int snp_pileup_main(List arguments)
 
   debugPrint("Debug: Completed snp_pileup_main", arguments.debug_mode);
   printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
-  if (arguments.gzipped)
-  {
-    bgzf_close(arguments.gzippedPointer);
-  }
-  else
-  {
-    fclose(output_file);
-  }
+  
+  bgzf_close(arguments.gzippedPointer);
+  
+  // else
+  // {
+  //   fclose(output_file);
+  // }
   return 0;
 }
 
