@@ -20,3 +20,5 @@ todo.md
 *.Rproj
 
 *.Rproj.user
+hello.R
+test_localfunc.cpp

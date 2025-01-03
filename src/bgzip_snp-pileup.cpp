@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include "../inst/include/snp-pileup-rev.h"
+#include "snp-pileup-rev.h"
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -9,11 +9,7 @@
 #include <ctime>
 
 using namespace Rcpp;
-// #include <htslib/synced_bcf_reader.h>
-// #include <htslib/sam.h>
-// #include <htslib/bgzf.h>
-// #include <htslib/vcf.h>
-// #include <htslib/hts.h>
+
 
 // Define the arguments structure
 #ifndef SNP_PILEUP_REV_H_DEFINED
@@ -414,7 +410,7 @@ uint64_t get_snp_count(char *file)
   return count;
 }
 
-int program_main(arguments arguments)
+int snp_pileup_main(List arguments)
 {
   debugPrint("Debug: enter program main", arguments.debug_mode);
 
@@ -914,7 +910,7 @@ int program_main(arguments arguments)
   }
   free(data);
 
-  debugPrint("Debug: Completed program_main", arguments.debug_mode);
+  debugPrint("Debug: Completed snp_pileup_main", arguments.debug_mode);
   printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
   if (arguments.gzipped)
   {
@@ -937,19 +933,19 @@ int program_main(arguments arguments)
 //' @return None.
 //' @export
 // [[Rcpp::export]]
-void run_snp_pileup_logic(const std::vector<std::string> &input_args)
+void run_snp_pileup_logic(List args)
 {
-  arguments args;
+  // arguments args;
 
-  // Parse the arguments
-  parse_arguments(input_args, args);
-  debugPrint("Debug: args parsed", args.debug_mode);
+  // // Parse the arguments
+  // parse_arguments(input_args, args);
+  // debugPrint("Debug: args parsed", args.debug_mode);
 
   // Run the main program
   // Rcpp::Rcout << "Debug: Running main program" << std::endl;
   debugPrint("Debug: running main program", args.debug_mode);
 
-  int status = program_main(args);
+  int status = snp_pileup_main(args);
   // Rcpp::Rcout << "Debug: Ran main program" << std::endl;
   debugPrint("Debug: Ran main program", args.debug_mode);
   if (status != 0)
