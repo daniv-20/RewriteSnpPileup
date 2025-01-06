@@ -1,4 +1,6 @@
-#include <Rcpp.h>
+//#include <Rcpp.h>
+#include <R.h>
+#include <Rinternals.h>
 #include "snp-pileup-rev.h"
 #include <iostream>
 #include <cstring>
@@ -8,32 +10,32 @@
 #include <sstream>
 #include <ctime>
 
-using namespace Rcpp;
+//using namespace Rcpp;
 
 
 // Define the arguments structure
 // want to take all of this out and put it in the r code
 #ifndef SNP_PILEUP_REV_H_DEFINED
 #define SNP_PILEUP_REV_H_DEFINED
-// struct arguments
-// {
-//   std::vector<std::string> args;
-//   bool count_orphans = false;
-//   bool gzipped = false;
-//   bool ignore_overlaps = false;
-//   int min_base_quality = 0;
-//   int min_map_quality = 0;
-//   std::vector<int> min_read_counts;
-//   int max_depth = 4000;
-//   int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
-//   void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
-//   bool progress = false;
-//   int pseudo_snps = 0;
-//   bool verbose = false;
-//   BGZF *gzippedPointer = nullptr; // Added
-//   bool debug_mode = false;        // added debug mode for my own sanity
-// };
-// #endif
+struct arguments
+{
+  std::vector<std::string> args;
+  bool count_orphans = true;
+  //bool gzipped = false;
+  bool ignore_overlaps = false;
+  int min_base_quality = 0;
+  int min_map_quality = 0;
+  std::vector<int> min_read_counts;
+  int max_depth = 4000;
+  int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
+  //void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
+  bool progress = false;
+  int pseudo_snps = 0;
+  bool verbose = false;
+  BGZF *gzippedPointer = nullptr; // Added
+  bool debug_mode = false;        // added debug mode for my own sanity
+};
+#endif
 
 // Function to read and parse the header
 bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
@@ -942,6 +944,26 @@ void run_snp_pileup_logic(List args)
 
   // Run the main program
   // Rcpp::Rcout << "Debug: Running main program" << std::endl;
+
+  arguments args = {}
+
+  std::vector<std::string> args;
+  bool count_orphans = false;
+  bool gzipped = false;
+  bool ignore_overlaps = false;
+  int min_base_quality = 0;
+  int min_map_quality = 0;
+  std::vector<int> min_read_counts;
+  int max_depth = 4000;
+  int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
+  void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
+  bool progress = false;
+  int pseudo_snps = 0;
+  bool verbose = false;
+  BGZF *gzippedPointer = nullptr; // Added
+  bool debug_mode = false;        // added debug mode for my own sanity
+
+
   debugPrint("Debug: running main program", args.debug_mode);
 
   int status = snp_pileup_main(args);
