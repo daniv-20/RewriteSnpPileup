@@ -17,7 +17,7 @@
 // want to take all of this out and put it in the r code
 #ifndef SNP_PILEUP_REV_H_DEFINED
 #define SNP_PILEUP_REV_H_DEFINED
-struct arguments
+struct arguments // some of these things will need to leave here...
 {
   std::vector<std::string> args;
   bool count_orphans = true;
@@ -440,7 +440,7 @@ int snp_pileup_main(List arguments)
     return 1;
   }
 
-  // Read and validate the VCF header
+  // Read and validate the VCF header -> can we remove this??
   std::vector<std::string> header_columns;
   if (!read_vcf_header(bgzf, header_columns))
   {
@@ -933,9 +933,8 @@ int snp_pileup_main(List arguments)
 //' @param debug A logical Value. If TRUE will print 'debug' statements.
 //' @return None.
 //' @export
-// [[Rcpp::export]]
-void run_snp_pileup_logic(List args)
-{
+
+SEXP 'C' run_snp_pileup_logic(SEXP args_in){
   // arguments args;
 
   // // Parse the arguments
@@ -945,24 +944,32 @@ void run_snp_pileup_logic(List args)
   // Run the main program
   // Rcpp::Rcout << "Debug: Running main program" << std::endl;
 
-  arguments args = {}
+  arguments args;
 
-  std::vector<std::string> args;
-  bool count_orphans = false;
-  bool gzipped = false;
-  bool ignore_overlaps = false;
-  int min_base_quality = 0;
-  int min_map_quality = 0;
-  std::vector<int> min_read_counts;
-  int max_depth = 4000;
-  int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
-  void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
-  bool progress = false;
-  int pseudo_snps = 0;
-  bool verbose = false;
-  BGZF *gzippedPointer = nullptr; // Added
-  bool debug_mode = false;        // added debug mode for my own sanity
+  // Populate the struct from the SEXP list
+  args.count_orphans = as<bool>(VECTOR_ELT(args_in, 0));         // Convert SEXP to bool
+  args.min_base_quality = as<int>(VECTOR_ELT(args_in, 1));      // Convert SEXP to int
+  args.min_map_quality = as<int>(VECTOR_ELT(args_in, 2));       // Convert SEXP to int
+  args.min_read_counts = as<std::vector<int>>(VECTOR_ELT(args_in, 3)); // Convert SEXP to vector<int>
+  args.max_depth = as<int>(VECTOR_ELT(args_in, 4));             // Convert SEXP to int
+  args.pseudo_snps = as<int>(VECTOR_ELT(args_in, 5));           // Convert SEXP to int
+  args.gzippedPointer = nullptr;   
 
+  // std::vector<std::string> args;
+  // bool count_orphans = false;
+  // bool gzipped = false;
+  // bool ignore_overlaps = false;
+  // int min_base_quality = 0;
+  // int min_map_quality = 0;
+  // std::vector<int> min_read_counts;
+  // int max_depth = 4000;
+  // int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
+  // void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
+  // bool progress = false;
+  // int pseudo_snps = 0;
+  // bool verbose = false;
+  // BGZF *gzippedPointer = nullptr; // Added
+  // bool debug_mode = false;        // added debug mode for my own sanity
 
   debugPrint("Debug: running main program", args.debug_mode);
 
