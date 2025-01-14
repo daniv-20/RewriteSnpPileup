@@ -947,13 +947,20 @@ SEXP 'C' run_snp_pileup_logic(SEXP args_in){
   arguments args;
 
   // Populate the struct from the SEXP list
-  args.count_orphans = as<bool>(VECTOR_ELT(args_in, 0));         // Convert SEXP to bool
-  args.min_base_quality = as<int>(VECTOR_ELT(args_in, 1));      // Convert SEXP to int
-  args.min_map_quality = as<int>(VECTOR_ELT(args_in, 2));       // Convert SEXP to int
-  args.min_read_counts = as<std::vector<int>>(VECTOR_ELT(args_in, 3)); // Convert SEXP to vector<int>
-  args.max_depth = as<int>(VECTOR_ELT(args_in, 4));             // Convert SEXP to int
-  args.pseudo_snps = as<int>(VECTOR_ELT(args_in, 5));           // Convert SEXP to int
-  args.gzippedPointer = nullptr;   
+  args.count_orphans = LOGICAL(VECTOR_ELT(args_in, 0))[0];           // Convert SEXP to bool
+  args.min_base_quality = INTEGER(VECTOR_ELT(args_in, 1))[0];        // Convert SEXP to int
+  args.min_map_quality = INTEGER(VECTOR_ELT(args_in, 2))[0];         // Convert SEXP to int
+
+  // Convert SEXP to vector<int> for min_read_counts
+  SEXP read_counts = VECTOR_ELT(args_in, 3);
+  int len = LENGTH(read_counts);
+  for (int i = 0; i < len; ++i) {
+      args.min_read_counts.push_back(INTEGER(read_counts)[i]);
+  }
+
+  args.max_depth = INTEGER(VECTOR_ELT(args_in, 4))[0];               // Convert SEXP to int
+  args.pseudo_snps = INTEGER(VECTOR_ELT(args_in, 5))[0];             // Convert SEXP to int
+  args.gzippedPointer = nullptr;
 
   // std::vector<std::string> args;
   // bool count_orphans = false;
