@@ -9,7 +9,7 @@
 #' @return None.
 #' @export
 run_snp_pileup_logic <- function(input_args) {
-    invisible(.Call(`_snp_plp_run_snp_pileup_logic`, input_args))
+    invisible(.Call(`run_snp_pileup_logic`, input_args))
 }
 
 #' Check Htslib Version

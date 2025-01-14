@@ -8,12 +8,10 @@
 #' @param  count_orphans Do not discard anomalous read pairs.
 #' @param max_depth Sets the maximum depth. Default is 4000.
 ##gzipped Compresses the output file with BGZF. If false, output file is CSV.
-#' @param progress If true, shows a progress bar. WARNING: requires additional time to calculate number of SNPs, and will take longer than normal.
 #' @param psuedo_snps Every n positions, if there is no SNP, insert a blank record with the total count at the position.
 #' @param min_map_quality Sets the minimum threshold for mapping quality. The default is 0.
 #' @param min_base_quality Sets the minimum threshold for base quality. Default is 0.
 #' @param min_read_counts Comma separated list of minimum read counts for position to be output. Default is 0.
-#' @param verbose If true, shows detailed messages.
 #' @param ignore_overlaps If true, disables read-pair overlap detection.
 #' @param debug_mode If true, shows many detailed messages.
 #' @return None. Results are written to the output file.
@@ -53,21 +51,18 @@ args <- list(
   output = output, 
   bamfiles = bamfiles,
   count_orphans = count_orphans,
-  gzipped = gzipped,
   ignore_overlaps = ignore_overlaps,
   min_base_quality = min_base_quality,
   min_map_quality = min_map_quality,
   min_read_counts = min_read_counts,
   max_depth = max_depth,
-  progress = progress,
   psuedo_snps = psuedo_snps,
-  verbose = verbose,
   debug_mode = debug_mode
 )
 
 # Categorize variables by expected type
-numeric_vars <- c("min_base_quality", "min_map_quality", "min_read_counts", "max_depth", "psuedo_snps")
-boolean_vars <- c("count_orphans", "gzipped", "ignore_overlaps", "progress", "verbose", "debug_mode")
+# numeric_vars <- c("min_base_quality", "min_map_quality", "min_read_counts", "max_depth", "psuedo_snps")
+# boolean_vars <- c("count_orphans", "gzipped", "ignore_overlaps", "progress", "verbose", "debug_mode")
 
 # Loop to validate user values
 # for (var_name in names(user_values)) {
