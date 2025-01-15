@@ -46,10 +46,22 @@ run_snp_pileup <- function(
 # if (!is.numeric(min_read_counts)) {
 #   stop(paste0("Error: Min_read_counts is ", class(min_read_counts), ". Min_read_counts must be numeric."))
 # }
+# args <- list(
+#   vcffile = vcffile, ## will need to somehow combine the vcffile, output and bamfiles vectors into one vector. 
+#   output = output, 
+#   bamfiles = bamfiles,
+#   count_orphans = count_orphans,
+#   ignore_overlaps = ignore_overlaps,
+#   min_base_quality = min_base_quality,
+#   min_map_quality = min_map_quality,
+#   min_read_counts = min_read_counts,
+#   max_depth = max_depth,
+#   psuedo_snps = psuedo_snps,
+#   debug_mode = debug_mode
+# )
+  
 args <- list(
-  vcffile = vcffile,
-  output = output, 
-  bamfiles = bamfiles,
+  args = c(vcffile, output, bamfiles),
   count_orphans = count_orphans,
   ignore_overlaps = ignore_overlaps,
   min_base_quality = min_base_quality,
@@ -104,5 +116,5 @@ args <- list(
 
 
 
-.Call("_snp_plp_run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
+.Call("run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
 }
