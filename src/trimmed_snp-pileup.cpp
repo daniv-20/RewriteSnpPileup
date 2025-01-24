@@ -28,10 +28,11 @@ struct arguments // some of these things will need to leave here...
   std::vector<int> min_read_counts;
   int max_depth = 4000;
   int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
-  //void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
-  bool progress = false;
+  // fix outfunc to not be needed because we are always gzipping
+  void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
+  //bool progress = false;
   int pseudo_snps = 0;
-  bool verbose = false;
+  //bool verbose = false;
   BGZF *gzippedPointer = nullptr; // Added
   bool debug_mode = false;        // added debug mode for my own sanity
 };
@@ -44,23 +45,23 @@ bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
   bool header_found = false;
   // size_t len = 0;
 
-  Rcpp::Rcout << "Debug: Entering read_vcf_header function" << std::endl;
+  //Rcpp::Rcout << "Debug: Entering read_vcf_header function" << std::endl;
 
   while (bgzf_getline(bgzf, '\n', &line) >= 0)
   {
     // Check if it's a header line
-    Rcpp::Rcout << "Debug: Read line: " << line.s << std::endl;
+    //Rcpp::Rcout << "Debug: Read line: " << line.s << std::endl;
     if (line.s[0] == '#')
     {
       // Check for the #CHROM line (last header line)
-      Rcpp::Rcout << "Debug: Line is a header line" << std::endl;
+      //Rcpp::Rcout << "Debug: Line is a header line" << std::endl;
       if (strncmp(line.s, "#CHROM", 6) == 0)
       {
         // Parse the #CHROM line into columns
         std::string header_line(line.s);
-        Rcpp::Rcout << "Debug: Found #CHROM line" << std::endl;
+        //Rcpp::Rcout << "Debug: Found #CHROM line" << std::endl;
         // Debug: Print the header line
-        Rcpp::Rcout << "Debug: Header line content: " << header_line << std::endl;
+        //Rcpp::Rcout << "Debug: Header line content: " << header_line << std::endl;
 
         std::istringstream iss(header_line);
         std::string column;
@@ -68,12 +69,12 @@ bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
         while (std::getline(iss, column, '\t'))
         {
           columns.push_back(column);
-          Rcpp::Rcout << "Debug: Parsed column: " << column << std::endl;
+          //Rcpp::Rcout << "Debug: Parsed column: " << column << std::endl;
         }
 
         if (columns.size() != 4)
         {
-          Rcpp::Rcerr << "Error: Expected 4 columns, but parsed " << columns.size() << " columns." << std::endl;
+         // Rcpp::Rcerr << "Error: Expected 4 columns, but parsed " << columns.size() << " columns." << std::endl;
           return false;
         }
         header_found = true;
@@ -107,13 +108,13 @@ bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
 
     if (column_count != 4)
     {
-      Rcpp::Rcerr << "Error: File does not have a header and the first line is not in 4-column format." << std::endl;
+      //Rcpp::Rcerr << "Error: File does not have a header and the first line is not in 4-column format." << std::endl;
       free(line.s);
       return false;
     }
 
     // Warn and continue
-    Rcpp::Rcout << "Warning: File does not have a header but appears to be in correct 4-column format. Continuing." << std::endl;
+    //Rcpp::Rcout << "Warning: File does not have a header but appears to be in correct 4-column format. Continuing." << std::endl;
     free(line.s); // Clean up
     return true;  // Header successfully read
   }
@@ -261,13 +262,13 @@ bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
 // }
 
 // A helper function for conditional debugging
-void debugPrint(const std::string &message, bool debug)
-{
-  if (debug)
-  {
-    Rcpp::Rcout << message << std::endl;
-  }
-}
+// void debugPrint(const std::string &message, bool debug)
+// {
+//   if (debug)
+//   {
+//     Rcpp::Rcout << message << std::endl;
+//   }
+// }
 
 // // Prints plain output to a file -> removing this because we will just gzip everything
 // void print_output(arguments arguments, std::string str, FILE *fp)
@@ -280,7 +281,7 @@ void gzip_output(arguments arguments, std::string str, FILE *fp)
 {
   if (bgzf_write(arguments.gzippedPointer, str.c_str(), str.length()) < 0)
   {
-    Rcpp::stop("Failed to write to file, terminating.");
+   // Rcpp::stop("Failed to write to file, terminating.");
   }
 }
 
@@ -413,9 +414,9 @@ uint64_t get_snp_count(char *file)
   return count;
 }
 
-int snp_pileup_main(List arguments)
+int snp_pileup_main(arguments arguments)
 {
-  debugPrint("Debug: enter program main", arguments.debug_mode);
+  //debugPrint("Debug: enter program main", arguments.debug_mode);
 
   clock_t start = clock();
 
@@ -430,7 +431,7 @@ int snp_pileup_main(List arguments)
   hts_verbose = 1;
 
   // Load VCF file
-  debugPrint("Debug: About to load vcf file", arguments.debug_mode);
+  //debugPrint("Debug: About to load vcf file", arguments.debug_mode);
 
   // open file
   BGZF *bgzf = bgzf_open(arguments.args[0].c_str(), "r");
@@ -445,14 +446,14 @@ int snp_pileup_main(List arguments)
   if (!read_vcf_header(bgzf, header_columns))
   {
 
-    Rcpp::Rcout << "Attempted to read header and failed: " << read_vcf_header(bgzf, header_columns) << std::endl;
+    //Rcpp::Rcout << "Attempted to read header and failed: " << read_vcf_header(bgzf, header_columns) << std::endl;
 
     std::cerr << "Invalid or missing VCF header in file: " << arguments.args[0] << std::endl;
     bgzf_close(bgzf);
     return 1;
   }
 
-  debugPrint("Debug: Loaded vcf file", arguments.debug_mode);
+  //debugPrint("Debug: Loaded vcf file", arguments.debug_mode);
 
   // calculate snp count for progress tracking
   uint64_t count = 0;
@@ -463,7 +464,7 @@ int snp_pileup_main(List arguments)
   //   std::cout << "done." << std::endl;
   // }
 
-  debugPrint("Debug: Construct BAM Data to pass to pileup engine", arguments.debug_mode);
+  //debugPrint("Debug: Construct BAM Data to pass to pileup engine", arguments.debug_mode);
   // Initialize BAM file data
   mplp_aux_t **data = (mplp_aux_t **)calloc(n, sizeof(mplp_aux_t *));
   for (i = 0; i < n; ++i)
@@ -506,7 +507,7 @@ int snp_pileup_main(List arguments)
   bam_hdr_t *hdr = data[0]->h;
 
   // Start pileup engine
-  debugPrint("Debug: Start pileup engine", arguments.debug_mode);
+  //debugPrint("Debug: Start pileup engine", arguments.debug_mode);
   iter = bam_mplp_init(n, mplp_func, (void **)data);
   if (!arguments.ignore_overlaps)
   {
@@ -514,10 +515,10 @@ int snp_pileup_main(List arguments)
   }
   bam_mplp_set_maxcnt(iter, arguments.max_depth);
 
-  if (arguments.verbose)
-  {
-    printf("Max per-file depth set to %d.\n", arguments.max_depth);
-  }
+  // if (arguments.verbose)
+  // {
+  //   printf("Max per-file depth set to %d.\n", arguments.max_depth);
+  // }
 
   // setup output file
 
@@ -534,11 +535,11 @@ int snp_pileup_main(List arguments)
   //   arguments.outFunc = print_output; // Default to plain text output
   // }
   // check if output exists
-  {
-    std::ostringstream oss;
-    oss << "Debug: Checking file existence for: " << fname;
-    debugPrint(oss.str(), arguments.debug_mode);
-  }
+  // {
+  //   std::ostringstream oss;
+  //   oss << "Debug: Checking file existence for: " << fname;
+  //   debugPrint(oss.str(), arguments.debug_mode);
+  // }
 
   // Rcpp::Rcout << "Debug: check if output exists." << std::endl;
   FILE *test_output = fopen(fname.c_str(), "r");
@@ -550,40 +551,21 @@ int snp_pileup_main(List arguments)
     fclose(test_output);
     return 1;
   }
-  debugPrint("Debug: Ready to open output", arguments.debug_mode);
+  //
+  //debugPrint("Debug: Ready to open output", arguments.debug_mode);
   // Rcpp::Rcout << "Debug: checked output." << std::endl;
   //  DON'T CLOSE test_output HERE because if you are here, test_output is null
   FILE *output_file = NULL;
-  if (arguments.gzipped)
-  {
+ 
     arguments.gzippedPointer = bgzf_open(fname.c_str(), "w+");
     if (!arguments.gzippedPointer)
     {
-      Rcpp::Rcerr << "Error: Failed to open gzipped output file." << std::endl;
+      //Rcpp::Rcerr << "Error: Failed to open gzipped output file." << std::endl;
       return 1;
     }
-    debugPrint("Debug: opened gzipped file", arguments.debug_mode);
-  }
-  else
-  {
+    //debugPrint("Debug: opened gzipped file", arguments.debug_mode);
+  
 
-    // open output file
-    output_file = fopen(fname.c_str(), "w+");
-    debugPrint("Debug: opened output", arguments.debug_mode);
-    // Rcpp::Rcout << "Debug: opened output." << std::endl;
-
-    if (!output_file)
-    {
-      printf("Failed to open output file for writing: %s\n", strerror(errno));
-      Rcpp::Rcerr << "Error: Failed to open output file for writing: " << strerror(errno) << std::endl;
-      debugPrint("Debug: output file could not be opened", arguments.debug_mode);
-      return 1;
-    }
-    else
-    {
-      debugPrint("Debug: File opened successfully", arguments.debug_mode);
-    }
-  }
 
   // Rcpp::Rcout << "Debug: File opened successfully." << std::endl;
   ostringstream output;
@@ -600,11 +582,11 @@ int snp_pileup_main(List arguments)
   output << "\n";
   // Debug header content
   // Rcpp::Rcout << "Debug: Header generated: " << output.str() << std::endl;
-  {
-    std::ostringstream oss;
-    oss << "Debug: Header generated: " << output.str();
-    debugPrint(oss.str(), arguments.debug_mode);
-  }
+  // {
+  //   std::ostringstream oss;
+  //   oss << "Debug: Header generated: " << output.str();
+  //   debugPrint(oss.str(), arguments.debug_mode);
+  // }
 
   // Write header to file -> does this need to be different for gzip???
   std::string header = output.str();
@@ -616,11 +598,11 @@ int snp_pileup_main(List arguments)
   }
   else
   {
-    Rcpp::Rcerr << "Error: outFunc is not initialized. No output can be written" << std::endl;
+    //Rcpp::Rcerr << "Error: outFunc is not initialized. No output can be written" << std::endl;
   }
 
   // Process VCF records
-  debugPrint("Debug: go thru it", arguments.debug_mode);
+  //debugPrint("Debug: go thru it", arguments.debug_mode);
   int ret;
   int tid, pos;
   vector<file_info> f_info = vector<file_info>();
@@ -629,7 +611,7 @@ int snp_pileup_main(List arguments)
   uint64_t current_count = 0;
   float last_progress = 100.0;
   bool have_snpped = false;
-  debugPrint("Debug: ready to loop", arguments.debug_mode);
+  //debugPrint("Debug: ready to loop", arguments.debug_mode);
   while (bgzf_getline(bgzf, '\n', &line) >= 0)
   {
     // Skip header lines
@@ -687,7 +669,7 @@ int snp_pileup_main(List arguments)
     // Filter for SNPs (single nucleotide variants only)
     if (ref.size() != 1 || alt.size() != 1)
     {
-      debugPrint("Skipping non-SNP record: " + std::string(line.s), arguments.debug_mode);
+      //debugPrint("Skipping non-SNP record: " + std::string(line.s), arguments.debug_mode);
       continue;
     }
     // Map VCF chromosome and position to BAM target indices
@@ -729,7 +711,7 @@ int snp_pileup_main(List arguments)
       // moving forward....
       if (tid == vcf_tid && pos == vcf_pos)
       {
-        debugPrint("Debug: Found matching SNP position!", arguments.debug_mode);
+        //debugPrint("Debug: Found matching SNP position!", arguments.debug_mode);
 
         //  {
         //         std::ostringstream oss;
@@ -747,11 +729,11 @@ int snp_pileup_main(List arguments)
         for (i = 0; i < n; ++i)
         {
 
-          {
-            std::ostringstream oss;
-            oss << "Debug: Processing file" << (i + 1) << " of " << n;
-            debugPrint(oss.str(), arguments.debug_mode);
-          }
+          // {
+          //   std::ostringstream oss;
+          //   oss << "Debug: Processing file" << (i + 1) << " of " << n;
+          //   debugPrint(oss.str(), arguments.debug_mode);
+          // }
           file_info this_file = {0, 0, 0, 0}; // Initialize counts
           if (n_plp[i] >= arguments.min_read_counts[i])
           {
@@ -785,11 +767,11 @@ int snp_pileup_main(List arguments)
           }
           else
           {
-            {
-              std::ostringstream oss;
-              oss << "Debug: Insufficient reads for file " << i + 1;
-              debugPrint(oss.str(), arguments.debug_mode);
-            }
+            // {
+            //   std::ostringstream oss;
+            //   oss << "Debug: Insufficient reads for file " << i + 1;
+            //   debugPrint(oss.str(), arguments.debug_mode);
+            // }
             fails_min = true;
           }
           if (this_file.refs != 0 || this_file.alts != 0 || this_file.errors != 0)
@@ -799,7 +781,7 @@ int snp_pileup_main(List arguments)
           f_info.push_back(this_file);
         }
 
-        debugPrint("Debug: end for loop, start print output", arguments.debug_mode);
+        //debugPrint("Debug: end for loop, start print output", arguments.debug_mode);
 
         // Write the SNP information to the output
         if (is_not_zero && !fails_min)
@@ -815,18 +797,13 @@ int snp_pileup_main(List arguments)
                    << "," << f_info[i].deletions;
           }
           output << "\n";
-          if (arguments.gzipped)
-          {
+          
             if (bgzf_write(arguments.gzippedPointer, output.str().c_str(), output.str().size()) < 0)
             {
               std::cerr << "Error writing to BGZF output file" << std::endl;
               return 1;
             }
-          }
-          else
-          {
-            fwrite(output.str().c_str(), sizeof(char), output.str().size(), output_file);
-          }
+          
         }
         f_info.clear();
         break;
@@ -912,7 +889,7 @@ int snp_pileup_main(List arguments)
   }
   free(data);
 
-  debugPrint("Debug: Completed snp_pileup_main", arguments.debug_mode);
+ // debugPrint("Debug: Completed snp_pileup_main", arguments.debug_mode);
   printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
   
   bgzf_close(arguments.gzippedPointer);
@@ -934,7 +911,7 @@ int snp_pileup_main(List arguments)
 //' @return None.
 //' @export
 
-SEXP 'C' run_snp_pileup_logic(SEXP args_in){
+extern "C" SEXP run_snp_pileup_logic(SEXP args_in){
   // arguments args;
 
   // // Parse the arguments
@@ -944,10 +921,26 @@ SEXP 'C' run_snp_pileup_logic(SEXP args_in){
   // Run the main program
   // Rcpp::Rcout << "Debug: Running main program" << std::endl;
 
+  std::cout << "Entered c++ land" << std::endl;
+
   arguments args;
 
+  std::cout << "Args args" << std::endl;
+
   // Populate the struct from the SEXP list
-  args.count_orphans = LOGICAL(VECTOR_ELT(args_in, 0))[0];           // Convert SEXP to bool
+  SEXP count_orphans_sexp = VECTOR_ELT(args_in, 0);
+  if (TYPEOF(count_orphans_sexp) != LGLSXP) {
+      Rf_error("Expected a logical value for 'count_orphans'.");
+  }
+
+  int logical_value = LOGICAL(count_orphans_sexp)[0];
+  if (logical_value == R_NaInt) {
+      Rf_error("'count_orphans' cannot be NA.");
+  }
+
+  args.count_orphans = (logical_value != 0); // Convert 0 to false, 1 to true
+
+ // args.count_orphans = LOGICAL(VECTOR_ELT(args_in, 0))[0];           // Convert SEXP to bool
   args.min_base_quality = INTEGER(VECTOR_ELT(args_in, 1))[0];        // Convert SEXP to int
   args.min_map_quality = INTEGER(VECTOR_ELT(args_in, 2))[0];         // Convert SEXP to int
 
@@ -961,6 +954,8 @@ SEXP 'C' run_snp_pileup_logic(SEXP args_in){
   args.max_depth = INTEGER(VECTOR_ELT(args_in, 4))[0];               // Convert SEXP to int
   args.pseudo_snps = INTEGER(VECTOR_ELT(args_in, 5))[0];             // Convert SEXP to int
   args.gzippedPointer = nullptr;
+
+  std::cout << "parsed the args" << std::endl;
 
   // std::vector<std::string> args;
   // bool count_orphans = false;
@@ -978,14 +973,14 @@ SEXP 'C' run_snp_pileup_logic(SEXP args_in){
   // BGZF *gzippedPointer = nullptr; // Added
   // bool debug_mode = false;        // added debug mode for my own sanity
 
-  debugPrint("Debug: running main program", args.debug_mode);
+  //debugPrint("Debug: running main program", args.debug_mode);
 
   int status = snp_pileup_main(args);
   // Rcpp::Rcout << "Debug: Ran main program" << std::endl;
-  debugPrint("Debug: Ran main program", args.debug_mode);
+  //debugPrint("Debug: Ran main program", args.debug_mode);
   if (status != 0)
   {
-    Rcpp::stop("Program terminated with errors.");
+    //Rcpp::stop("Program terminated with errors.");
   }
 }
 
@@ -996,8 +991,8 @@ SEXP 'C' run_snp_pileup_logic(SEXP args_in){
 //' @return None.
 //' @export
 // [[Rcpp::export]]
-void htslib_version()
+extern "C" SEXP htslib_version_cpp()
 {
   // Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
-  Rcpp::Rcout << "HTSlib version:" << hts_version() << std::endl;
+  std::cout << "HTSlib version:" << hts_version() << std::endl;
 }

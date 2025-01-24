@@ -31,6 +31,8 @@ run_snp_pileup <- function(
   psuedo_snps = 0,
   # verbose = FALSE,
   debug_mode = FALSE) {
+
+  print("Entering snp.plp function")
   ## remove this extra stuff
 # if (!file.exists(vcffile)) stop("Input file does not exist: ", vcffile)
 # if (file.exists(output)) stop("Output file already exists: ", output)
@@ -62,16 +64,18 @@ run_snp_pileup <- function(
   
 args <- list(
   args = c(vcffile, output, bamfiles),
-  count_orphans = count_orphans,
-  ignore_overlaps = ignore_overlaps,
+  count_orphans = as.bool(TRUE), #as.bool(count_orphans),
+  ignore_overlaps = as.bool(FALSE),#as.bool(ignore_overlaps),
   min_base_quality = min_base_quality,
   min_map_quality = min_map_quality,
   min_read_counts = min_read_counts,
   max_depth = max_depth,
   psuedo_snps = psuedo_snps,
-  debug_mode = debug_mode
+  debug_mode = as.bool(debug_mode)
 )
 
+print("Made args list")
+print(paste0(names(args), collapse = ", "))
 # Categorize variables by expected type
 # numeric_vars <- c("min_base_quality", "min_map_quality", "min_read_counts", "max_depth", "psuedo_snps")
 # boolean_vars <- c("count_orphans", "gzipped", "ignore_overlaps", "progress", "verbose", "debug_mode")
@@ -113,8 +117,12 @@ args <- list(
 # if (verbose) {
 #   qual_args <- c(qual_args, "-v")
 # }
-
-
-
 .Call("run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
+  
+}
+
+#' @export
+htsvers = function(){
+  print("Calling htslib version")
+  .Call("htslib_version_cpp")
 }

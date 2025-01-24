@@ -7,6 +7,8 @@ Logs/Log_2024-12-04_11-18-39.txt
 .venv/*
 .nfs*
 
+*.gz
+
 *.so
 *.o
 *.dll
@@ -22,3 +24,4 @@ todo.md
 *.Rproj.user
 hello.R
 
+snp.plp_0.0.0.9000.tar.gz
