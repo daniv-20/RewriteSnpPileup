@@ -925,13 +925,12 @@ extern "C" SEXP run_snp_pileup_logic(SEXP args_in){
 
   arguments args;
 
-  std::cout << "Args args" << std::endl;
+  std::cout << "made Args args" << std::endl;
 
   // Populate the struct from the SEXP list
-  SEXP count_orphans_sexp = VECTOR_ELT(args_in, 0);
-  if (TYPEOF(count_orphans_sexp) != LGLSXP) {
-      Rf_error("Expected a logical value for 'count_orphans'.");
-  }
+  INTEGER count_orphans_sexp = INTEGER(VECTOR_ELT(args_in, 0))[0];
+
+  std::cout<< "Count orphans: "<< count_orphans_sexp  << "Type: "<< TYPEOF(count_orphans_sexp)<< std::endl;
 
   int logical_value = LOGICAL(count_orphans_sexp)[0];
   if (logical_value == R_NaInt) {
@@ -995,4 +994,6 @@ extern "C" SEXP htslib_version_cpp()
 {
   // Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
   std::cout << "HTSlib version:" << hts_version() << std::endl;
+
+  return 0;
 }
