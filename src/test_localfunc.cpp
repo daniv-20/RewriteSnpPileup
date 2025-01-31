@@ -47,7 +47,7 @@ extern "C" SEXP zlibVers() {
 //     return arguments_sexp;
 
 // }
-
+//' @export
 extern "C" SEXP process_list(SEXP input_list) {
     Rprintf("Hello from process_list\n");
 
@@ -57,7 +57,7 @@ extern "C" SEXP process_list(SEXP input_list) {
 
     // Populate the struct from the SEXP list
     arguments args;
-    args.count_orphans = LOGICAL(VECTOR_ELT(input_list, 0))[0];
+    args.count_orphans = INTEGER(VECTOR_ELT(input_list, 0))[0];
     std::cout << "count_orphans: " << args.count_orphans << "\n";
     args.min_base_quality = INTEGER(VECTOR_ELT(input_list, 1))[0];
     std::cout << "min_base_quality: " << args.min_base_quality << "\n";

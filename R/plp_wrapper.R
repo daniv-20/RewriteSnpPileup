@@ -64,14 +64,14 @@ run_snp_pileup <- function(
   
 args <- list(
   args = c(vcffile, output, bamfiles),
-  count_orphans = as.bool(TRUE), #as.bool(count_orphans),
-  ignore_overlaps = as.bool(FALSE),#as.bool(ignore_overlaps),
+  count_orphans = count_orphans, ##ifelse(count_orphans, 1L, 0L),
+  ignore_overlaps =  ifelse(ignore_overlaps, 1L, 0L),
   min_base_quality = min_base_quality,
   min_map_quality = min_map_quality,
   min_read_counts = min_read_counts,
   max_depth = max_depth,
   psuedo_snps = psuedo_snps,
-  debug_mode = as.bool(debug_mode)
+  debug_mode =  ifelse(debug_mode, 1L, 0L)
 )
 
 print("Made args list")

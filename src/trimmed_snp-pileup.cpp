@@ -910,7 +910,6 @@ int snp_pileup_main(arguments arguments)
 //' @param debug A logical Value. If TRUE will print 'debug' statements.
 //' @return None.
 //' @export
-
 extern "C" SEXP run_snp_pileup_logic(SEXP args_in){
   // arguments args;
 
@@ -928,30 +927,34 @@ extern "C" SEXP run_snp_pileup_logic(SEXP args_in){
   std::cout << "made Args args" << std::endl;
 
   // Populate the struct from the SEXP list
-  INTEGER count_orphans_sexp = INTEGER(VECTOR_ELT(args_in, 0))[0];
+  // int count_orphans_sexp;
 
-  std::cout<< "Count orphans: "<< count_orphans_sexp  << "Type: "<< TYPEOF(count_orphans_sexp)<< std::endl;
+  // std::cout<< "Count orphans: "<< VECTOR_ELT(args_in, 0) << std::endl;  
+  // count_orphans_sexp = INTEGER(VECTOR_ELT(args_in, 0))[0];
 
-  int logical_value = LOGICAL(count_orphans_sexp)[0];
-  if (logical_value == R_NaInt) {
-      Rf_error("'count_orphans' cannot be NA.");
-  }
+  // std::cout<< "Count orphans: "<< count_orphans_sexp  << "Type: "<< TYPEOF(count_orphans_sexp)<< std::endl;
 
-  args.count_orphans = (logical_value != 0); // Convert 0 to false, 1 to true
+  // int logical_value = LOGICAL(count_orphans_sexp)[0];
+  // if (logical_value == R_NaInt) {
+  //     Rf_error("'count_orphans' cannot be NA.");
+  // }
 
- // args.count_orphans = LOGICAL(VECTOR_ELT(args_in, 0))[0];           // Convert SEXP to bool
-  args.min_base_quality = INTEGER(VECTOR_ELT(args_in, 1))[0];        // Convert SEXP to int
-  args.min_map_quality = INTEGER(VECTOR_ELT(args_in, 2))[0];         // Convert SEXP to int
+  //args.count_orphans = (count_orphans_sexp != 0); // Convert 0 to false, 1 to true
+
+  args.count_orphans = LOGICAL(VECTOR_ELT(args_in, 0))[0];           // Convert SEXP to bool
+  args.ignore_overlaps = LOGICAL(VECTOR_ELT(args_in, 1))[0];
+  args.min_base_quality = INTEGER(VECTOR_ELT(args_in, 2))[0];        // Convert SEXP to int
+  args.min_map_quality = INTEGER(VECTOR_ELT(args_in, 3))[0];         // Convert SEXP to int
 
   // Convert SEXP to vector<int> for min_read_counts
-  SEXP read_counts = VECTOR_ELT(args_in, 3);
+  SEXP read_counts = VECTOR_ELT(args_in, 4);
   int len = LENGTH(read_counts);
   for (int i = 0; i < len; ++i) {
       args.min_read_counts.push_back(INTEGER(read_counts)[i]);
   }
 
-  args.max_depth = INTEGER(VECTOR_ELT(args_in, 4))[0];               // Convert SEXP to int
-  args.pseudo_snps = INTEGER(VECTOR_ELT(args_in, 5))[0];             // Convert SEXP to int
+  args.max_depth = INTEGER(VECTOR_ELT(args_in, 5))[0];               // Convert SEXP to int
+  args.pseudo_snps = INTEGER(VECTOR_ELT(args_in, 6))[0];             // Convert SEXP to int
   args.gzippedPointer = nullptr;
 
   std::cout << "parsed the args" << std::endl;
@@ -989,11 +992,63 @@ extern "C" SEXP run_snp_pileup_logic(SEXP args_in){
 //'
 //' @return None.
 //' @export
-// [[Rcpp::export]]
+//// [[Rcpp::export]]
 extern "C" SEXP htslib_version_cpp()
 {
   // Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
   std::cout << "HTSlib version:" << hts_version() << std::endl;
+}
 
-  return 0;
+//' @export
+extern "C" SEXP process_list2(SEXP input_list) {
+    Rprintf("Hello from process_list\n");
+
+    if (!Rf_isNewList(input_list)) {
+        Rf_error("Input must be a named list.");
+    }
+
+    // Populate the struct from the SEXP list
+    arguments args;
+    args.count_orphans = LOGICAL(VECTOR_ELT(input_list, 0))[0];
+    std::cout << "count_orphans: " << args.count_orphans << "\n";
+    args.ignore_overlaps = LOGICAL(VECTOR_ELT(input_list, 1))[0];
+    std::cout << "ignore_overlaps: " << args.ignore_overlaps << "\n";
+    args.min_base_quality = INTEGER(VECTOR_ELT(input_list, 2))[0];
+    std::cout << "min_base_quality: " << args.min_base_quality << "\n";
+    args.min_map_quality = INTEGER(VECTOR_ELT(input_list, 3))[0];
+    std::cout << "min_map_quality: " << args.min_map_quality << "\n";
+
+    // Convert SEXP to std::vector<int> for min_read_counts
+    SEXP read_counts = VECTOR_ELT(input_list, 4);
+    int len = LENGTH(read_counts);
+    for (int i = 0; i < len; ++i) {
+        args.min_read_counts.push_back(INTEGER(read_counts)[i]);
+        std::cout << "min_read_counts[" << i << "]: " << args.min_read_counts[i] << "\n";
+    }
+
+    args.max_depth = INTEGER(VECTOR_ELT(input_list, 5))[0];
+   std::cout << "max_depth: " << args.max_depth << "\n";
+
+    args.pseudo_snps = INTEGER(VECTOR_ELT(input_list, 6))[0];
+    std::cout << "pseudo_snps: " << args.pseudo_snps << "\n";
+    
+
+    // Convert SEXP to std::vector<std::string> for args
+    SEXP char_args = VECTOR_ELT(input_list, 6);
+    int char_len = LENGTH(char_args);
+    for (int i = 0; i < char_len; ++i) {
+        args.args.push_back(CHAR(STRING_ELT(char_args, i)));
+        std::cout << "args[" << i << "]: " << args.args[i] << "\n";
+    }
+
+    
+
+    // Debug output
+    
+    
+    
+   
+
+    // Return the original list for now
+    return input_list;
 }

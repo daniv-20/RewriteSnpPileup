@@ -16,8 +16,12 @@ rm(list = ls())
 
 snp.plp::htsvers()
 
+snp.plp::test_pl
+
 snp.plp::run_snp_pileup(vcffile = "/usr/local/share/VCF/common_all_20180418_dedup_bg.vcf.gz", 
-bamfiles = c("bam", "bam bam"), output = "please_work_finally_thanks")
+bamfiles = c("bam", "bam bam"), output = "please_work_finally_thanks", count_orphans = 1.5)
+
+
 
 remove.packages("snp.plp")
 
