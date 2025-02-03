@@ -541,15 +541,15 @@ int snp_pileup_main(arguments arguments)
   // }
 
   // Rcpp::Rcout << "Debug: check if output exists." << std::endl;
-  FILE *test_output = fopen(fname.c_str(), "r");
-  if (test_output)
-  {
-    std::cerr << "Output file already exists: "
-              << arguments.args[1]
-              << std::endl;
-    fclose(test_output);
-    return 1;
-  }
+  // FILE *test_output = fopen(fname.c_str(), "r");
+  // if (test_output)
+  // {
+  //   std::cerr << "Output file already exists: "
+  //             << arguments.args[1]
+  //             << std::endl;
+  //   fclose(test_output);
+  //   return 1;
+  // }
   //
   // debugPrint("Debug: Ready to open output", arguments.debug_mode);
   // Rcpp::Rcout << "Debug: checked output." << std::endl;
@@ -563,7 +563,7 @@ int snp_pileup_main(arguments arguments)
     return 1;
   }
   // debugPrint("Debug: opened gzipped file", arguments.debug_mode);
-
+  std::cout << "opened gzipped file" << std::endl;
   // Rcpp::Rcout << "Debug: File opened successfully." << std::endl;
   ostringstream output;
 
@@ -588,15 +588,16 @@ int snp_pileup_main(arguments arguments)
   // Write header to file -> does this need to be different for gzip???
   std::string header = output.str();
 
-  // check on outfunc
-  if (arguments.outFunc != nullptr)
-  {
-    (arguments.outFunc)(arguments, output.str(), output_file);
-  }
-  else
-  {
-    // Rcpp::Rcerr << "Error: outFunc is not initialized. No output can be written" << std::endl;
-  }
+  // // check on outfunc
+  // if (arguments.outFunc != nullptr)
+  // {
+  //   (arguments.outFunc)(arguments, output.str(), output_file);
+  // }
+  // else
+  // {
+  //   // Rcpp::Rcerr << "Error: outFunc is not initialized. No output can be written" << std::endl;
+  // }
+  gzip_output(arguments, output.str(), output_file)
 
   // Process VCF records
   // debugPrint("Debug: go thru it", arguments.debug_mode);
@@ -860,7 +861,8 @@ int snp_pileup_main(arguments arguments)
             output << ",0,0,0";
           }
           output << "\n";
-          (arguments.outFunc)(arguments, output.str(), output_file);
+          //(arguments.outFunc)(arguments, output.str(), output_file);
+          gzip_output(arguments, output.str(), output_file)
         }
         f_info.clear();
       }
@@ -908,40 +910,22 @@ int snp_pileup_main(arguments arguments)
 //' @export
 extern "C" SEXP run_snp_pileup_logic(SEXP args_in)
 {
-  // arguments args;
-
-  // // Parse the arguments
-  // parse_arguments(input_args, args);
-  // debugPrint("Debug: args parsed", args.debug_mode);
-
-  // Run the main program
-  // Rcpp::Rcout << "Debug: Running main program" << std::endl;
-
   std::cout << "Entered c++ land" << std::endl;
 
   arguments args;
 
   std::cout << "made Args args" << std::endl;
 
-  // Populate the struct from the SEXP list
-  // int count_orphans_sexp;
-
-  // std::cout<< "Count orphans: "<< VECTOR_ELT(args_in, 0) << std::endl;
-  // count_orphans_sexp = INTEGER(VECTOR_ELT(args_in, 0))[0];
-
-  // std::cout<< "Count orphans: "<< count_orphans_sexp  << "Type: "<< TYPEOF(count_orphans_sexp)<< std::endl;
-
-  // int logical_value = LOGICAL(count_orphans_sexp)[0];
-  // if (logical_value == R_NaInt) {
-  //     Rf_error("'count_orphans' cannot be NA.");
-  // }
-
-  // args.count_orphans = (count_orphans_sexp != 0); // Convert 0 to false, 1 to true
-
-  args.count_orphans = LOGICAL(VECTOR_ELT(args_in, 0))[0]; // Convert SEXP to bool
-  args.ignore_overlaps = LOGICAL(VECTOR_ELT(args_in, 1))[0];
-  args.min_base_quality = INTEGER(VECTOR_ELT(args_in, 2))[0]; // Convert SEXP to int
-  args.min_map_quality = INTEGER(VECTOR_ELT(args_in, 3))[0];  // Convert SEXP to int
+  std::cout << "Made args, working on count orphans" << "\n";
+  //args.count_orphans = INTEGER(VECTOR_ELT(args_in, 0))[0] != 0; // velt(args_in,0) = 13 (integer)
+  args.count_orphans = (INTEGER(VECTOR_ELT(args_in, 0))[0] != 0) ? true : false;
+  std::cout << "count_orphans: " << args.count_orphans << "\n";
+  args.ignore_overlaps = INTEGER(VECTOR_ELT(args_in, 1))[0] != 0;// LOGICAL(VECTOR_ELT(args_in, 1))[0]; // this is of type integer (13)
+  std::cout << "ignore_overlaps: " << args.ignore_overlaps << "\n";
+  args.min_base_quality = INTEGER(VECTOR_ELT(args_in, 2))[0]; // type real (14)
+  std::cout << "min_base_quality: " << args.min_base_quality << "\n";
+  args.min_map_quality = INTEGER(VECTOR_ELT(args_in, 3))[0]; // type real (14)
+  std::cout << "min_map_quality: " << args.min_map_quality << "\n";
 
   // Convert SEXP to vector<int> for min_read_counts
   SEXP read_counts = VECTOR_ELT(args_in, 4);
@@ -953,35 +937,27 @@ extern "C" SEXP run_snp_pileup_logic(SEXP args_in)
 
   args.max_depth = INTEGER(VECTOR_ELT(args_in, 5))[0];   // Convert SEXP to int
   args.pseudo_snps = INTEGER(VECTOR_ELT(args_in, 6))[0]; // Convert SEXP to int
+
+    SEXP char_args = VECTOR_ELT(args_in, 7);
+  int char_len = LENGTH(char_args);
+  for (int i = 0; i < char_len; ++i)
+  {
+    args.args.push_back(CHAR(STRING_ELT(char_args, i)));
+    std::cout << "args[" << i << "]: " << args.args[i] << "\n";
+  }
   args.gzippedPointer = nullptr;
 
   std::cout << "parsed the args" << std::endl;
-
-  // std::vector<std::string> args;
-  // bool count_orphans = false;
-  // bool gzipped = false;
-  // bool ignore_overlaps = false;
-  // int min_base_quality = 0;
-  // int min_map_quality = 0;
-  // std::vector<int> min_read_counts;
-  // int max_depth = 4000;
-  // int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
-  // void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
-  // bool progress = false;
-  // int pseudo_snps = 0;
-  // bool verbose = false;
-  // BGZF *gzippedPointer = nullptr; // Added
-  // bool debug_mode = false;        // added debug mode for my own sanity
-
-  // debugPrint("Debug: running main program", args.debug_mode);
-
   int status = snp_pileup_main(args);
+
+  std::cout << "ran main" << std::endl;
   // Rcpp::Rcout << "Debug: Ran main program" << std::endl;
   // debugPrint("Debug: Ran main program", args.debug_mode);
   if (status != 0)
   {
     // Rcpp::stop("Program terminated with errors.");
   }
+  return args_in;
 }
 
 //' Check Htslib Version
@@ -990,7 +966,6 @@ extern "C" SEXP run_snp_pileup_logic(SEXP args_in)
 //'
 //' @return None.
 //' @export
-//// [[Rcpp::export]]
 extern "C" SEXP htslib_version_cpp()
 {
   // Rcpp::Rcout << "Htslib linked successfully - snp-pileup!" << std::endl;
