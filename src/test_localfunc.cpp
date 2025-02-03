@@ -11,6 +11,7 @@
 struct arguments // some of these things will need to leave here...
 {
     bool count_orphans;
+    bool ignore_overlaps;
     int min_base_quality;
     int min_map_quality;
     std::vector<int> min_read_counts;
@@ -161,13 +162,14 @@ extern "C" SEXP process_list2(SEXP input_list)
   arguments args;
   Rprintf("Made args");
   std::cout << "Made args, working on count orphans" << "\n";
-  args.count_orphans = LOGICAL(VECTOR_ELT(input_list, 0))[0];
+  //args.count_orphans = INTEGER(VECTOR_ELT(input_list, 0))[0] != 0; // velt(input_list,0) = 13 (integer)
+  args.count_orphans = (INTEGER(VECTOR_ELT(input_list, 0))[0] != 0) ? true : false;
   std::cout << "count_orphans: " << args.count_orphans << "\n";
-  args.ignore_overlaps = LOGICAL(VECTOR_ELT(input_list, 1))[0];
+  args.ignore_overlaps = INTEGER(VECTOR_ELT(input_list, 1))[0] != 0;// LOGICAL(VECTOR_ELT(input_list, 1))[0]; // this is of type integer (13)
   std::cout << "ignore_overlaps: " << args.ignore_overlaps << "\n";
-  args.min_base_quality = INTEGER(VECTOR_ELT(input_list, 2))[0];
+  args.min_base_quality = INTEGER(VECTOR_ELT(input_list, 2))[0]; // type real (14)
   std::cout << "min_base_quality: " << args.min_base_quality << "\n";
-  args.min_map_quality = INTEGER(VECTOR_ELT(input_list, 3))[0];
+  args.min_map_quality = INTEGER(VECTOR_ELT(input_list, 3))[0]; // type real (14)
   std::cout << "min_map_quality: " << args.min_map_quality << "\n";
 
   // Convert SEXP to std::vector<int> for min_read_counts
@@ -186,7 +188,7 @@ extern "C" SEXP process_list2(SEXP input_list)
   std::cout << "pseudo_snps: " << args.pseudo_snps << "\n";
 
   // Convert SEXP to std::vector<std::string> for args
-  SEXP char_args = VECTOR_ELT(input_list, 6);
+  SEXP char_args = VECTOR_ELT(input_list, 7);
   int char_len = LENGTH(char_args);
   for (int i = 0; i < char_len; ++i)
   {

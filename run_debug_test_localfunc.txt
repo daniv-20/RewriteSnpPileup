@@ -1,0 +1,62 @@
+Step1: Compile test_localfunc.cpp
+terminal: 
+R CMD SHLIB src/test_localfunc.cpp
+
+export R_HOME=/opt/R/4.3.1/lib/R
+export LD_LIBRARY_PATH=/opt/R/4.3.1/lib/R/lib:$LD_LIBRARY_PATH
+gdb --args /opt/R/4.3.1/lib/R/bin/exec/R --vanilla
+
+from w/in gdb: 
+dyn.load("src/test_localfunc.so")
+
+ctrl+c to pause R
+
+From gdb: 
+break process_list2
+
+## in gdb paste what is below: 
+
+dyn.load("src/test_localfunc.so")
+
+test_pl <- function(
+  vcffile, ## vcf file path
+  output, ## output file path
+  bamfiles, ## vector of file paths
+  count_orphans = TRUE,
+  # gzipped = FALSE,
+  ignore_overlaps = FALSE,
+  min_base_quality = 0,
+  min_map_quality = 0,
+  min_read_counts = 0,
+  max_depth = 4000,
+  # progress = FALSE,
+  psuedo_snps = 0,
+  # verbose = FALSE,
+  debug_mode = FALSE) {
+  
+    args <- list(
+      count_orphans = ifelse(count_orphans, 1L, 0L),
+      ignore_overlaps =  ifelse(ignore_overlaps, 1L, 0L),
+      min_base_quality = as.integer(min_base_quality),
+      min_map_quality = as.integer(min_map_quality),
+      min_read_counts = as.integer(min_read_counts),
+      max_depth = max_depth,
+      psuedo_snps = psuedo_snps,
+      debug_mode =  ifelse(debug_mode, 1L, 0L),
+      args = c(vcffile, output, bamfiles)
+    )
+    
+    print("Made args list")
+    .Call("process_list2", args) ## will change to _facets_run_snp_pileup_logic
+  
+  }
+
+
+
+test_pl(vcffile = "/usr/local/share/VCF/common_all_20180418_dedup_bg.vcf.gz", 
+bamfiles = c("bam", "bam bam"), output = "please_work_finally_thanks", count_orphans = 0)
+
+
+## tests once in debugger
+
+call TYPEOF(VECTOR_ELT(input_list, 0))
