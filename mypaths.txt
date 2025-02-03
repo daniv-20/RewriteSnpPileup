@@ -1,0 +1,10 @@
+gdb debugger: export PATH=/scratch/dani/progs/gdb/bin:$PATH
+
+compile::
+g++ -g -shared -fPIC src/trimmed_snp-pileup.cpp -o trimmed_snp-pileup.so \
+ $(R CMD config --cppflags) \
+ $(R CMD config --ldflags) \
+ -I/opt/R/4.3.1/lib/R/site-library/Rhtslib/include \
+ -L/opt/R/4.3.1/lib/R/site-library/Rhtslib/usrlib/ -lhts 
+ 
+ ^^ above command works!!
