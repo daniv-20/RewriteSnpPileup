@@ -147,3 +147,53 @@ extern "C" SEXP process_list(SEXP input_list) {
 //     // Return the original list for now
 //     return input_list;
 // }
+
+//' @export
+extern "C" SEXP process_list2(SEXP input_list)
+{
+  Rprintf("Hello from process_list\n");
+
+  // if (!Rf_isNewList(input_list)) {
+  //     Rf_error("Input must be a named list.");
+  // }
+
+  // Populate the struct from the SEXP list
+  arguments args;
+  Rprintf("Made args");
+  std::cout << "Made args, working on count orphans" << "\n";
+  args.count_orphans = LOGICAL(VECTOR_ELT(input_list, 0))[0];
+  std::cout << "count_orphans: " << args.count_orphans << "\n";
+  args.ignore_overlaps = LOGICAL(VECTOR_ELT(input_list, 1))[0];
+  std::cout << "ignore_overlaps: " << args.ignore_overlaps << "\n";
+  args.min_base_quality = INTEGER(VECTOR_ELT(input_list, 2))[0];
+  std::cout << "min_base_quality: " << args.min_base_quality << "\n";
+  args.min_map_quality = INTEGER(VECTOR_ELT(input_list, 3))[0];
+  std::cout << "min_map_quality: " << args.min_map_quality << "\n";
+
+  // Convert SEXP to std::vector<int> for min_read_counts
+  SEXP read_counts = VECTOR_ELT(input_list, 4);
+  int len = LENGTH(read_counts);
+  for (int i = 0; i < len; ++i)
+  {
+    args.min_read_counts.push_back(INTEGER(read_counts)[i]);
+    std::cout << "min_read_counts[" << i << "]: " << args.min_read_counts[i] << "\n";
+  }
+
+  args.max_depth = INTEGER(VECTOR_ELT(input_list, 5))[0];
+  std::cout << "max_depth: " << args.max_depth << "\n";
+
+  args.pseudo_snps = INTEGER(VECTOR_ELT(input_list, 6))[0];
+  std::cout << "pseudo_snps: " << args.pseudo_snps << "\n";
+
+  // Convert SEXP to std::vector<std::string> for args
+  SEXP char_args = VECTOR_ELT(input_list, 6);
+  int char_len = LENGTH(char_args);
+  for (int i = 0; i < char_len; ++i)
+  {
+    args.args.push_back(CHAR(STRING_ELT(char_args, i)));
+    std::cout << "args[" << i << "]: " << args.args[i] << "\n";
+  }
+
+  // Return the original list for now
+  return input_list;
+}
