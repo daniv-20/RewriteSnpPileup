@@ -32,7 +32,7 @@ run_snp_pileup <- function(
   # verbose = FALSE,
   debug_mode = FALSE) {
 
-  print("Entering snp.plp function")
+  # print("Entering snp.plp function")
 
   if(length(min_read_counts) < length(bamfiles)){
     if(length(min_read_counts) == 1){
@@ -58,8 +58,8 @@ args <- list(
   args = c(vcffile, output, bamfiles)
 )
 
-print("Made args list")
-print(paste0(names(args), collapse = ", "))
+# print("Made args list")
+# print(paste0(names(args), collapse = ", "))
 
 .Call("run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
   
@@ -67,6 +67,6 @@ print(paste0(names(args), collapse = ", "))
 
 #' @export
 htsvers = function(){
-  print("Calling htslib version")
+  # print("Calling htslib version")
   .Call("htslib_version_cpp")
 }

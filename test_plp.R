@@ -34,7 +34,7 @@ bams = c(file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_B
 sink("log.txt")
 
 snp.plp::run_snp_pileup(vcffile = vcf, 
-bamfiles = bams, output = "/scratch/dani/snpplpextras/data/test_bgz.csv.gz", count_orphans = TRUE)
+bamfiles = bams, output = "/scratch/dani/snpplpextras/data/bgztest.csv.gz", count_orphans = TRUE)
 
 remove.packages("snp.plp")
 
