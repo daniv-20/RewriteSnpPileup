@@ -25,3 +25,6 @@ todo.md
 hello.R
 
 snp.plp_0.0.0.9000.tar.gz
+
+data/*
+*.txt
