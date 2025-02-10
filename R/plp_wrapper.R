@@ -33,90 +33,34 @@ run_snp_pileup <- function(
   debug_mode = FALSE) {
 
   print("Entering snp.plp function")
-  ## remove this extra stuff
-# if (!file.exists(vcffile)) stop("Input file does not exist: ", vcffile)
-# if (file.exists(output)) stop("Output file already exists: ", output)
-# if (!gzipped) {
-#   if (!grepl("\\.csv$", output)) {
-#     output <- paste0(output, ".csv")
-#     warning("Output file does not end in .csv. Adding .csv. \n New output file: ", output)
-#   }
-# }
-# for (bamfile in bamfiles) {
-#   if (!file.exists(bamfile)) stop("Bam file does not exist: ", bamfile)
-# }
-# if (!is.numeric(min_read_counts)) {
-#   stop(paste0("Error: Min_read_counts is ", class(min_read_counts), ". Min_read_counts must be numeric."))
-# }
-# args <- list(
-#   vcffile = vcffile, ## will need to somehow combine the vcffile, output and bamfiles vectors into one vector. 
-#   output = output, 
-#   bamfiles = bamfiles,
-#   count_orphans = count_orphans,
-#   ignore_overlaps = ignore_overlaps,
-#   min_base_quality = min_base_quality,
-#   min_map_quality = min_map_quality,
-#   min_read_counts = min_read_counts,
-#   max_depth = max_depth,
-#   psuedo_snps = psuedo_snps,
-#   debug_mode = debug_mode
-# )
+
+  if(length(min_read_counts) < length(bamfiles)){
+    if(length(min_read_counts) == 1){
+      count = min_read_counts
+      min_read_counts = rep(count, length(bamfiles))
+    }
+    else{
+      min_read_counts = c(min_read_counts, rep(0, length(bamfiles) - length(min_read_counts)))
+    }
+  }
+  if(length(min_read_counts) > length(bamfiles)){
+    min_read_counts = min_read_counts[1:length(bamfiles)]
+  }
   
 args <- list(
-  args = c(vcffile, output, bamfiles),
-  count_orphans = count_orphans, ##ifelse(count_orphans, 1L, 0L),
+  count_orphans = ifelse(count_orphans, 1L, 0L),
   ignore_overlaps =  ifelse(ignore_overlaps, 1L, 0L),
-  min_base_quality = min_base_quality,
-  min_map_quality = min_map_quality,
-  min_read_counts = min_read_counts,
-  max_depth = max_depth,
-  psuedo_snps = psuedo_snps,
-  debug_mode =  ifelse(debug_mode, 1L, 0L)
+  min_base_quality = as.integer(min_base_quality),
+  min_map_quality = as.integer(min_map_quality),
+  min_read_counts = as.integer(min_read_counts),
+  max_depth = as.integer(max_depth),
+  psuedo_snps = as.integer(psuedo_snps),
+  args = c(vcffile, output, bamfiles)
 )
 
 print("Made args list")
 print(paste0(names(args), collapse = ", "))
-# Categorize variables by expected type
-# numeric_vars <- c("min_base_quality", "min_map_quality", "min_read_counts", "max_depth", "psuedo_snps")
-# boolean_vars <- c("count_orphans", "gzipped", "ignore_overlaps", "progress", "verbose", "debug_mode")
 
-# Loop to validate user values
-# for (var_name in names(user_values)) {
-#   value <- user_values[[var_name]]
-
-#   if (var_name %in% numeric_vars && !is.numeric(value)) {
-#     stop(sprintf("Error: %s is not numeric (type: %s).\n", var_name, class(value)))
-#   }
-
-#   if (var_name %in% boolean_vars && !is.logical(value)) {
-#     stop(sprintf("Error: %s is not boolean (type: %s).\n", var_name, class(value)))
-#   }
-# }
-
-
-# qual_args <- c(
-#   "-Q", min_base_quality,
-#   "-q", min_map_quality,
-#   "-r", min_read_counts,
-#   "-d", max_depth,
-#   "-P", psuedo_snps
-# )
-
-# if (count_orphans) {
-#   qual_args <- c(qual_args, "-A")
-# }
-# if (gzipped) {
-#   qual_args <- c(qual_args, "-g")
-# }
-# if (ignore_overlaps) {
-#   qual_args <- c(qual_args, "-x")
-# }
-# if (progress) {
-#   qual_args <- c(qual_args, "-p")
-# }
-# if (verbose) {
-#   qual_args <- c(qual_args, "-v")
-# }
 .Call("run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
   
 }
