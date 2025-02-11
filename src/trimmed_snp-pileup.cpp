@@ -10,29 +10,21 @@
 #include <sstream>
 #include <ctime>
 
-// using namespace Rcpp;
-
 // Define the arguments structure
 #ifndef SNP_PILEUP_REV_H_DEFINED
 #define SNP_PILEUP_REV_H_DEFINED
-struct arguments // some of these things will need to leave here...
+struct arguments 
 {
   std::vector<std::string> args;
   bool count_orphans = true;
-  // bool gzipped = false;
   bool ignore_overlaps = false;
   int min_base_quality = 0;
   int min_map_quality = 0;
   std::vector<int> min_read_counts;
   int max_depth = 4000;
   int rflag_filter = BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP;
-  // fix outfunc to not be needed because we are always gzipping
-  //void (*outFunc)(arguments, std::string, FILE *) = nullptr; // set default to print output
-  // bool progress = false;
   int pseudo_snps = 0;
-  // bool verbose = false;
   BGZF *gzippedPointer = nullptr; // Added
-  //bool debug_mode = false;        // added debug mode for my own sanity
 };
 #endif
 
@@ -116,22 +108,21 @@ bool read_vcf_header(BGZF *bgzf, std::vector<std::string> &columns)
 
 
 
-// Writes gzipped output to a file ->> COME BACK HERE!!!!
-// void gzip_output(arguments arguments, std::string str, FILE *fp)
-// {
-//   if (bgzf_write(arguments.gzippedPointer, str.c_str(), str.length()) < 0)
-//   {
-//     // Rcpp::stop("Failed to write to file, terminating.");
-//   }
-// }
-void gzip_output(arguments arguments, std::string str, BGZF *fp) {
-    int written = bgzf_write(arguments.gzippedPointer, str.c_str(), str.length());
-    if (written < 0) {
-        std::cerr << "Error: bgzf_write failed!" << std::endl;
-    } else {
-        //std::cout << "Successfully wrote " << written << " bytes to gzip file" << std::endl;
-    }
+// Writes gzipped output to a file 
+void gzip_output(arguments arguments, std::string str, FILE *fp)
+{
+  if (bgzf_write(arguments.gzippedPointer, str.c_str(), str.length()) < 0)
+  {
+    std::cerr << 'Failed to write to file, terminating.' << std::endl;
+  }
 }
+// void gzip_output(arguments arguments, std::string str, BGZF *fp) {
+//     int written = bgzf_write(arguments.gzippedPointer, str.c_str(), str.length());
+//     if (written < 0) {
+//         std::cerr << "Error: bgzf_write failed!" << std::endl;
+//     } else {
+//     }
+// }
 
 
 // Checks if a string ends with a certain substring
@@ -297,9 +288,6 @@ int snp_pileup_main(arguments arguments)
   std::vector<std::string> header_columns;
   if (!read_vcf_header(bgzf, header_columns))
   {
-
-    // Rcpp::Rcout << "Attempted to read header and failed: " << read_vcf_header(bgzf, header_columns) << std::endl;
-
     std::cerr << "Invalid or missing VCF header in file: " << arguments.args[0] << std::endl;
     bgzf_close(bgzf);
     return 1;

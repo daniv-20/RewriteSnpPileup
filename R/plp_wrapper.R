@@ -21,18 +21,14 @@ run_snp_pileup <- function(
   output, ## output file path
   bamfiles, ## vector of file paths
   count_orphans = TRUE,
-  # gzipped = FALSE,
   ignore_overlaps = FALSE,
   min_base_quality = 0,
   min_map_quality = 0,
   min_read_counts = 0,
   max_depth = 4000,
-  # progress = FALSE,
-  psuedo_snps = 0,
-  # verbose = FALSE,
-  debug_mode = FALSE) {
+  psuedo_snps = 0) {
 
-  # print("Entering snp.plp function")
+  ## make sure we have the correct number of min_read_counts
 
   if(length(min_read_counts) < length(bamfiles)){
     if(length(min_read_counts) == 1){
@@ -58,11 +54,9 @@ args <- list(
   args = c(vcffile, output, bamfiles)
 )
 
-# print("Made args list")
-# print(paste0(names(args), collapse = ", "))
+## run c++ code
 
-.Call("run_snp_pileup_logic", args) ## will change to _facets_run_snp_pileup_logic
-  
+.Call("run_snp_pileup_logic", args)   
 }
 
 #' @export
