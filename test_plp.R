@@ -22,8 +22,8 @@ rm(list = ls())
 
 snp.plp::htsvers()
 
-snp.plp::test_pl(vcffile = "/scratch/dani/RewriteSnpPileup/data", 
-bamfiles = bams, output = "please_work_finally_thanks", count_orphans = FALSE)
+# snp.plp::test_pl(vcffile = "/scratch/dani/RewriteSnpPileup/data", 
+# bamfiles = bams, output = "please_work_finally_thanks", count_orphans = FALSE)
 
 datapath = "/ebfs/epibio/seshanv/snp-pileup"
 #vcf = "/scratch/dani/RewriteSnpPileup/data/clean.vcf.gz"
@@ -34,7 +34,7 @@ bams = c(file.path(datapath, "HCC1143_BC10.bam"), file.path(datapath, "HCC1143_B
 sink("log.txt")
 
 snp.plp::run_snp_pileup(vcffile = vcf, 
-bamfiles = bams, output = "/scratch/dani/snpplpextras/data/bgztest.csv.gz", count_orphans = TRUE)
+bamfiles = bams, output = "/scratch/dani/snpplpextras/data/bgztest.csv.gz", count_orphans = TRUE, min_read_counts = 5)
 
 remove.packages("snp.plp")
 

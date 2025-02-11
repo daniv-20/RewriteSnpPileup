@@ -5,15 +5,13 @@
 #' @param vcffile Input file path (e.g., VCF file).
 #' @param output Output file path.
 #' @param bamfiles Vector of bamfile paths.
-#' @param  count_orphans Do not discard anomalous read pairs.
+#' @param count_orphans Do not discard anomalous read pairs.
+#' @param ignore_overlaps If true, disables read-pair overlap detection.
 #' @param max_depth Sets the maximum depth. Default is 4000.
-##gzipped Compresses the output file with BGZF. If false, output file is CSV.
 #' @param psuedo_snps Every n positions, if there is no SNP, insert a blank record with the total count at the position.
 #' @param min_map_quality Sets the minimum threshold for mapping quality. The default is 0.
 #' @param min_base_quality Sets the minimum threshold for base quality. Default is 0.
 #' @param min_read_counts Comma separated list of minimum read counts for position to be output. Default is 0.
-#' @param ignore_overlaps If true, disables read-pair overlap detection.
-#' @param debug_mode If true, shows many detailed messages.
 #' @return None. Results are written to the output file.
 #' @export
 run_snp_pileup <- function(
@@ -53,9 +51,6 @@ args <- list(
   psuedo_snps = as.integer(psuedo_snps),
   args = c(vcffile, output, bamfiles)
 )
-
-## run c++ code
-
 .Call("run_snp_pileup_logic", args)   
 }
 
