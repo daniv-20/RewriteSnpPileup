@@ -518,7 +518,7 @@ int snp_pileup_main(arguments arguments)
   free(data);
 
   // debugPrint("Debug: Completed snp_pileup_main", arguments.debug_mode);
-  printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
+  //printf("Finished in %f seconds.\n", (clock() - start) / (double)CLOCKS_PER_SEC);
 
   bgzf_close(arguments.gzippedPointer);
 
