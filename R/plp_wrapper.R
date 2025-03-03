@@ -5,10 +5,10 @@
 #' @param vcffile Input file path (e.g., VCF file).
 #' @param output Output file path.
 #' @param bamfiles Vector of bamfile paths.
-#' @param count_orphans Do not discard anomalous read pairs.
-#' @param ignore_overlaps If true, disables read-pair overlap detection.
+#' @param count_orphans If true, do not discard anomalous read pairs. Default TRUE.
+#' @param ignore_overlaps If true, disables read-pair overlap detection. Default FALSE.
 #' @param max_depth Sets the maximum depth. Default is 4000.
-#' @param psuedo_snps Every n positions, if there is no SNP, insert a blank record with the total count at the position.
+#' @param psuedo_snps Every n positions, if there is no SNP, insert a blank record with the total count at the position. Default is 0.
 #' @param min_map_quality Sets the minimum threshold for mapping quality. The default is 0.
 #' @param min_base_quality Sets the minimum threshold for base quality. Default is 0.
 #' @param min_read_counts Comma separated list of minimum read counts for position to be output. Default is 0.
@@ -20,11 +20,12 @@ run_snp_pileup <- function(
   bamfiles, ## vector of file paths
   count_orphans = TRUE,
   ignore_overlaps = FALSE,
-  min_base_quality = 0,
-  min_map_quality = 0,
-  min_read_counts = 0,
   max_depth = 4000,
-  psuedo_snps = 0) {
+  psuedo_snps = 0,
+  min_map_quality = 0,
+  min_base_quality = 0,
+  min_read_counts = 0
+  ) {
 
   ## make sure we have the correct number of min_read_counts
 
@@ -54,6 +55,9 @@ args <- list(
 .Call("run_snp_pileup_logic", args)   
 }
 
+#' @title htsvers function
+#' @description Gets the version of HTSLIB being run
+#' @return Returns the version of htslib being run. 
 #' @export
 htsvers = function(){
   # print("Calling htslib version")

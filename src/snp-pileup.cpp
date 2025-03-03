@@ -34,7 +34,7 @@ void gzip_output(arguments arguments, std::string str, BGZF *fp)
 {
   if (bgzf_write(arguments.gzippedPointer, str.c_str(), str.length()) < 0)
   {
-    std::cerr << "Error: bgzf_write failed!" << std::endl;
+    Rprintf("Error: Failed to write to bgzf file.");
   }
 }
 
@@ -141,14 +141,14 @@ uint64_t get_snp_count(char *file)
   uint64_t count = 0;
   // Open BGZF compressed vcf file in read mode
   BGZF *bgzf = bgzf_open(file, "r");
-  if (!bgzf)
-  {
-    std::cerr << "Failed to open BGZF file: " << file << std::endl;
-    return -1; // return -1 if there is an error
-  }
-  else{
-    std::cout << "Opened bgzf file: " << file << std::endl;
-  }
+    if (!bgzf) {
+        REprintf("Failed to open BGZF file: %s\n", file);
+        return -1; // return -1 if there is an error
+    } else {
+        //Rprintf("Opened BGZF file: %s\n", file);
+        bgzf_close(bgzf); // Ensure we close the file after opening
+        return 0;
+    }
 
   // Buffer for reading lines
   kstring_t line = {0, 0, NULL}; // Initialize kstring_t
@@ -193,7 +193,7 @@ int snp_pileup_main(arguments arguments)
   BGZF *bgzf = bgzf_open(arguments.args[0].c_str(), "r");
   if (!bgzf)
   {
-    std::cerr << "Failed to open BGZF file: " << arguments.args[0] << std::endl;
+    Rprintf("Failed to open BGZF file: %s\n", arguments.args[0].c_str());
     return 1;
   }
 
@@ -209,7 +209,7 @@ int snp_pileup_main(arguments arguments)
     hFILE *hfp = hopen(arguments.args[i + 2].c_str(), "r");
     if (!hfp)
     {
-      std::cerr << "Failed to open BAM file: " << arguments.args[i + 2] << std::endl;
+      REprintf("Failed to open BAM file: %s\n", arguments.args[i + 2].c_str());
       return 1;
     }
 
@@ -219,13 +219,13 @@ int snp_pileup_main(arguments arguments)
     if (!data[i]->fp)
     {
       // Error handling: Couldn't open the file
-      std::cerr << "Couldn't open sequence file: " << arguments.args[i + 2]
-                << " (" << strerror(errno) << ")" << std::endl;
+      REprintf("Couldn't open sequence file: %s (%s)\n", 
+         arguments.args[i + 2].c_str(), strerror(errno));
       // hclose(hfp); // Clean up the file handle
       if (hclose(hfp) != 0)
       {
         // Handle the error, e.g., log an error message or throw an exception.
-        std::cerr << "Error: Failed to close file handle." << std::endl;
+        REprintf("Error: Failed to close file handle.");
       }
       return 1;
     }
@@ -284,7 +284,7 @@ int snp_pileup_main(arguments arguments)
 
   // make sure there is a valid bgzf pointer
   if (!arguments.gzippedPointer) {
-    std::cerr << "ERROR: BGZF pointer is NULL!" << std::endl;
+    Rprintf("Error: BGZF pointer is NULL!");
 }
 
 // write the header to the output file 
@@ -324,7 +324,7 @@ int snp_pileup_main(arguments arguments)
     // Validate record
     if (fields.size() < 4)
     {
-      std::cerr << "Malformed VCF record: " << line.s << std::endl;
+      Rprintf("Malformed VCF record: %s\n", line.s);
       continue;
     }
 
@@ -425,7 +425,7 @@ int snp_pileup_main(arguments arguments)
           }
           output << "\n";
           if (!arguments.gzippedPointer) {
-    std::cerr << "ERROR: BGZF pointer is NULL!" << std::endl;
+    Rprintf("ERROR: BGZF pointer is NULL!");
 }
           // writey write
           gzip_output(arguments, output.str(), output_file);

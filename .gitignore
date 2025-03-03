@@ -34,3 +34,5 @@ ign.txt
 tstplp.R
 
 snp-plp.py
+..Rcheck/*
+*.rds
